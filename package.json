@@ -1,0 +1,23 @@
+{
+  "name": "projectified-backend",
+  "version": "1.0.0",
+  "description": "NodeJS backend for Projectified by AM-KA",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AM-KA/Projectified-Backend.git"
+  },
+  "keywords": [
+    "node",
+    "js"
+  ],
+  "author": "Akash Mahapatra",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AM-KA/Projectified-Backend/issues"
+  },
+  "homepage": "https://github.com/AM-KA/Projectified-Backend#readme"
+}
