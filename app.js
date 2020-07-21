@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 const userRoutes = require('./api/routes/user');
+const offerRoutes = require('./api/routes/offer');
 
 mongoose.connect(
     'mongodb+srv://dbUser:abcd1234@projectified.kcttx.mongodb.net/<dbname>?retryWrites=true&w=majority',
@@ -38,7 +39,8 @@ app.use((req, res, next)=>{
 });
 
 app.use('/user', userRoutes);
- 
+app.use ('/offer', offerRoutes);
+
 app.use((req, res, next)=> {
     const error = new Error("Not found");
     error.status = 404;

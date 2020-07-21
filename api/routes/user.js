@@ -7,7 +7,6 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 router.post('/signup', (req, res, next) =>{
-    console.log(mongoose.connection.readyState);
     User
     .find({email: req.body.email})
     .exec()
@@ -77,6 +76,7 @@ router.post('/login', (req, res, next) => {
                 
                 return res.status(200).json({
                     message : "Login successful",
+                    userID : user[0]._id,
                     token : tok
                 });
             }
