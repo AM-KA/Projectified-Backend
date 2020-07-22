@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 
 const Offer = require('../models/offer');
 const checkAuth = require('../middleware/check-auth');
-const offer = require('../models/offer');
+
 
 router.post('/', checkAuth, (req, res, next) => {
     const date = new Date();

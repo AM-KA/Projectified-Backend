@@ -6,6 +6,8 @@ const mongoose = require('mongoose');
 
 const userRoutes = require('./api/routes/user');
 const offerRoutes = require('./api/routes/offer');
+const userProfileRoutes=require('/api/routes/Profile');
+const applyOpportunity1Routes=require('/api/routes/applyOpportunity1')
 
 mongoose.connect(
     'mongodb+srv://dbUser:abcd1234@projectified.kcttx.mongodb.net/<dbname>?retryWrites=true&w=majority',
@@ -38,6 +40,8 @@ app.use((req, res, next)=>{
     next();
 });
 
+app.use('/Apply1',applyOpportunity1Routes)
+app.use('/Profile',userProfileRoutes)
 app.use('/user', userRoutes);
 app.use ('/offer', offerRoutes);
 
