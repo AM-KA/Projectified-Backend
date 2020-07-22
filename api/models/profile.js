@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
-const applyOpportuninty1Schema = new mongoose.Schema({
+const profileSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
-    Name : {
+    name : {
         type: String,
         required : true
     },
@@ -10,44 +10,44 @@ const applyOpportuninty1Schema = new mongoose.Schema({
         type: Date,
         required : true
     },
-    College_name : {
+    collegeName : {
         type: String,
         required: true
     },
-    Semester: {
-        type: Integer,
+    semester: {
+        type: Number,
         required: true
     },
 
-    Languages: {
+    languages: {
         type: Array,
         required: true
     },
 
-    Interest1: {
+    interest1: {
         type: String,
         required: true
     },
-    Interest2: {
+    interest2: {
         type: String,
         required: true
     },
-    Interest3: {
+    interest3: {
         type: String,
         required: true
     },
-    Hobbies: {
+    hobbies: {
         type: String,
         required: true
     },
 
-    Description: {
+    description: {
         type: String,
         required: true
     },
   
 
 });
-module.exports = mongoose.model('MyApplication', MyApplicationSchema);
+module.exports = mongoose.model('Profile', profileSchema);
 
 

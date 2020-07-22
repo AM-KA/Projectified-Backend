@@ -1,0 +1,40 @@
+User : 
+    signUp          Done
+    logIn           Done
+    createProfile   Done
+    editProfile     
+
+    Master Options:
+        getAllUsers Done
+        getAllProfiles Done
+
+Offer:
+    Candidate Options:
+        getOffersByDomain (CardView)    Done
+        getOfferById (Apply-1)          Done
+
+    Recruiter Options:
+        addOffer                        Done
+        getOffersByRecruiter (CardView) 
+        getOfferByIdRecruiter
+        updateOffer
+        deleteOffer
+        toggleVisibility                Done
+        getOfferApplicants (CardView)
+
+    Master Options:
+
+
+Application :
+    Recruiter Options:
+        getApplicationById
+        markSeen
+        markSelected
+    
+    Candidate Options:
+        addApplication
+        getApplicationsByCandidate (CardView)
+        getApplicationByIdCandidate (Detail)
+        updateApplication
+        deleteApplication
+    
