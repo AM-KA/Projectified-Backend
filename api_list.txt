@@ -2,11 +2,15 @@ User :
     signUp          Done
     logIn           Done
     createProfile   Done
-    editProfile     
+    updateProfile       
 
     Master Options:
-        getAllUsers Done
-        getAllProfiles Done
+        getAllUsers         Done
+        getAllProfiles      Done
+        deleteAllUsers      Done
+        deleteAllProfiles   Done
+        deleteUserById      Done
+        deleteProfileById   Done
 
 Offer:
     Candidate Options:
@@ -14,15 +18,16 @@ Offer:
         getOfferById (Apply-1)          Done
 
     Recruiter Options:
-        addOffer                        Done
-        getOffersByRecruiter (CardView) 
-        getOfferByIdRecruiter
-        updateOffer
-        deleteOffer
-        toggleVisibility                Done
-        getOfferApplicants (CardView)
+        addOffer                        Done    (Auth)
+        getOffersByRecruiter (CardView)         (Auth)  (Need number of applicants)
+        getOfferByIdRecruiter           Done    (Auth)       
+        updateOffer                     Done    (Auth)
+        deleteOffer                     Done    (Auth)
+        toggleVisibility                Done    (Auth)
+        getOfferApplicants (CardView)   (  )    (Auth)  (Need applicant data)
 
     Master Options:
+        getAllOffers                    Done
 
 
 Application :
@@ -37,4 +42,7 @@ Application :
         getApplicationByIdCandidate (Detail)
         updateApplication
         deleteApplication
+
+    Master Options:
+        getAllApplications
     

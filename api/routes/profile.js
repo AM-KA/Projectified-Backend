@@ -37,8 +37,13 @@ router.post('/', checkAuth, (req, res, next) => {
     });
 });
 
+
+
+//  MASTER OPTIONS
+
+
 /*
-    This route is solely for checking purposes. Don't expose it.
+    getAllProfiles : This route is solely for checking purposes. Don't expose it.
 */
 router.get('/', (req, res, next) => {
     Profile
@@ -54,4 +59,29 @@ router.get('/', (req, res, next) => {
     });
 });
 
+/*
+    deleteAllProfiles : This route is solely for checking purposes. Don't expose it.
+*/
+router.delete('/', checkAuth, (req, res, next) => {
+    Profile.deleteMany().exec();
+});
+
+/*
+    deleteProfileById : This route is solely for checking purposes. Don't expose it.
+*/
+router.delete("/:userId", checkAuth, (req, res, next) => {
+    Profile.remove({_id: req.params.userId})
+    .exec()
+    .then(result => {
+        res.status(200).json({
+            message : "Delete success!"
+        });
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json({
+            error:err
+        });
+    });
+});
 module.exports = router;

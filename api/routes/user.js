@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
+const checkAuth = require('../middleware/check-auth');
 
 router.post('/signup', (req, res, next) =>{
     User
@@ -95,13 +96,20 @@ router.post('/login', (req, res, next) => {
     });
 });
 
-router.delete("/:userId", (req, res, next) => {
-    User.remove({_id: req.params.userId})
-    .exec()
+
+
+
+//  MASTER OPTIONS
+
+
+/*
+    getAllUsers : This route is solely for checking purposes. Don't expose it.
+*/
+router.get('/', (req, res, next) => {
+    User
+    .find()
     .then(result => {
-        res.status(200).json({
-            message : "Delete success!"
-        });
+        res.status(200).json(result);
     })
     .catch(err => {
         console.log(err);
@@ -110,14 +118,24 @@ router.delete("/:userId", (req, res, next) => {
         });
     });
 });
+
 /*
-    This route is solely for checking purposes. Don't expose it.
+    deleteAllUsers : This route is solely for checking purposes. Don't expose it.
 */
-router.get('/', (req, res, next) => {
-    User
-    .find()
+router.delete('/', checkAuth, (req, res, next) => {
+    User.deleteMany().exec();
+});
+
+/*
+    deleteUserById : This route is solely for checking purposes. Don't expose it.
+*/
+router.delete("/:userId", checkAuth, (req, res, next) => {
+    User.remove({_id: req.params.userId})
+    .exec()
     .then(result => {
-        res.status(200).json(result);
+        res.status(200).json({
+            message : "Delete success!"
+        });
     })
     .catch(err => {
         console.log(err);
