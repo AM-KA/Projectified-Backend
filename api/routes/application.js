@@ -236,7 +236,7 @@ router.get('/:application_id', (req, res, next) => {
                 return res.status(500).json(err);
             });
 
-        }); 
+            
 
 
     /*
@@ -260,14 +260,11 @@ router.patch('/SeenMarked/:application_id', checkAuth, (req, res, next) => {
             message: "Seen Marked successfully."
         });
     })
-}
-})
+
     .catch(err => {
         console.log(err);
         return res.status(500).json(err);
     });
-
-});
       
     router.patch('/SelectedMarked/:application_id', checkAuth, (req, res, next) => {
         const app_id = req.params.applicantion_id;
@@ -297,7 +294,7 @@ router.patch('/SeenMarked/:application_id', checkAuth, (req, res, next) => {
           
      
  router.post('/SeenMarked/:application_id', checkAuth, (req, res, next) => {
-            const app_id = req.params.application_id;
+            const app_id = req.paramsapplication_id;
             Offer.updateOne({ _id : app_id},
                 {
                     is_Selected: req.body.Selected
