@@ -93,16 +93,17 @@ router.delete('/:application_id', checkAuth, (req, res, next) => {
     getApplications-ByCandidate(CARD VIEW)
 */
 router.get('/byApplicant/:applicantID', checkAuth, (req, res, next) => {
-    const appt_id = req.params.applicantI                      //  appt =   application
+    const appt_id = req.params.applicant                   //  appt =   applicant
     Application.find({applicant_id : appt_id})
     .then(async result  => {
         var vals = [];
         var performa = {
             offer_name:"",
+            allication_id:"",
             college_name:"",
             float_date: "",
-            markAsSeen:"false",
-            markAsSelected:"false"
+            is_Seen:"false",
+            is_Selected:"false"
            
         }
         for(i=0; i<result.length; i++){
@@ -116,6 +117,7 @@ router.get('/byApplicant/:applicantID', checkAuth, (req, res, next) => {
 
             performa.offer_name = offer.offer_name;
             performa.float_date=offer.float_date;
+            performa.application_id=result._id
             performa.college_name=recruiterProfile.college_name;
             vals.push(performa);
         }
@@ -203,20 +205,22 @@ router.get('/:application_id', (req, res, next) => {
     .then(result => {
         var performa = {
            college_name:"", 
-           markAsSeen:"false",
+           is_Selected:"false",
            date:"",
-           markAsSeen:"false",
+           applicant_id="",
+           is_seen:"false",
         };
         for(i=0; i<result.length; i++){
             if(result){
-            //Obtaining applicant profile  for CollegeNamea
+            //Obtaining applicant profile  for CollegeName
             const applicantProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(result.applicant_id) });
                 performa.college_name = applicantProfile.college_name;
                 performa.date=result.apply_date;
+                performa.applicant_id=result.applicant_id;
                 vals.push(performa);
             
                 res.status(200).json({
-                    message : "Offer detail fetched successfully.",
+                    message : "Applications detail fetched successfully.",
                     offer : performa
                 });
             }
@@ -232,24 +236,82 @@ router.get('/:application_id', (req, res, next) => {
                 return res.status(500).json(err);
             });
 
+        }); 
+
 
     /*
-    Seen As Marked
+    Seen Marked
 */
-router.post('/SeenMarked/:applicant_id', checkAuth, (req, res, next) => {
-    const app_id = req.params.applicant_id;
-    Offer.updateOne({ _id : app_id},
+router.patch('/SeenMarked/:application_id', checkAuth, (req, res, next) => {
+    const app_id = req.params.applicantion_id;
+    Application.findOne({ _id : app_id})
+    .exec()
+    .then(result =>{
+     const seen=result.is_seen;
+
+       if(seen == "false")
+      { Application.updateOne({ _id : app_id},
         {
-            markAsSeen: req.body.markedSeen
+            is_seen: req.body.markedSeen
         })
     .exec()
     .then(result =>{
         res.status(200).json({
-            message: "Offer had been seen."
+            message: "Seen Marked successfully."
         });
     })
+}
+})
     .catch(err => {
         console.log(err);
         return res.status(500).json(err);
     });
+
 });
+      
+    router.patch('/SelectedMarked/:application_id', checkAuth, (req, res, next) => {
+        const app_id = req.params.applicantion_id;
+        Application.findOne({ _id : app_id})
+        .exec()
+        .then(result =>{
+         const selected=result.is_seen;
+    
+           if(seen == "false")
+          { Application.updateOne({ _id : app_id},
+            {
+                is_seen: req.body.markedSeen
+            })
+        .exec()
+        .then(result =>{
+            res.status(200).json({
+                message: "Seen Marked successfully."
+            });
+        })
+    }
+    })
+        .catch(err => {
+            console.log(err);
+            return res.status(500).json(err);
+        });
+    });
+          
+     
+ router.post('/SeenMarked/:application_id', checkAuth, (req, res, next) => {
+            const app_id = req.params.application_id;
+            Offer.updateOne({ _id : app_id},
+                {
+                    is_Selected: req.body.Selected
+                })
+            .exec()
+            .then(result =>{
+                res.status(200).json({
+                    message: "Application status changed successfully."
+                });
+            })
+            .catch(err => {
+                console.log(err);
+                return res.status(500).json(err);
+            });
+        });
+        
+module.exports = router;  

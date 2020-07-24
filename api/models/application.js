@@ -14,13 +14,13 @@ const applicationSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    markAsSeen:{
+    is_Seen:{
 
         boolean:false,
         default:true
     
     },
-    markAsSelected:{
+    is_Selected:{
 
         boolean:false,
         default:true
