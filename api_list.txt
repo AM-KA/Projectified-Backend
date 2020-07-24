@@ -37,11 +37,11 @@ Application :
         markSelected
     
     Candidate Options:
-        addApplication
-        getApplicationsByCandidate (CardView)
-        getApplicationByIdCandidate (Detail)
-        updateApplication
-        deleteApplication
+        addApplication                          DONE 
+        getApplicationsByCandidate (CardView)   DONE
+        getApplicationByIdCandidate (Detail)    DONE
+        updateApplication                       DONE
+        deleteApplication                       DONE
 
     Master Options:
         getAllApplications

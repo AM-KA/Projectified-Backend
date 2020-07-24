@@ -225,10 +225,7 @@ router.patch('/:offerID', checkAuth, (req, res, next) => {
 */
 router.post('/toggle/:offer_id', checkAuth, (req, res, next) => {
     const off_id = req.params.offer_id;
-    Offer.updateOne(
-        {
-            _id : off_id
-        },
+    Offer.updateOne({ _id : off_id},
         {
             is_visible: req.body.visibility
         })
