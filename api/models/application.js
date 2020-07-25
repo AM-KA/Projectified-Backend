@@ -25,14 +25,10 @@ const applicationSchema = mongoose.Schema({
         boolean:false,
         default:true
     
-    },
-
-    
-  offer_id:   mongoose.Schema.Types.ObjectId,
+    },  
+    offer_id:   mongoose.Schema.Types.ObjectId,
     applicant_id:   mongoose.Schema.Types.ObjectId,
     recruiter_id : mongoose.Schema.Types.ObjectId,
-   
-    
 });
 
 module.exports = mongoose.model('Application', applicationSchema);

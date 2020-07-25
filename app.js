@@ -8,6 +8,7 @@ const userRoutes = require('./api/routes/user');
 const offerRoutes = require('./api/routes/offer');
 const userProfileRoutes=require('./api/routes/profile');
 const applicationRoutes=require('./api/routes/application')
+const faqRoutes = require('./api/routes/faq');
 
 mongoose.connect(
     'mongodb+srv://dbUser:abcd1234@projectified.kcttx.mongodb.net/<dbname>?retryWrites=true&w=majority',
@@ -44,7 +45,7 @@ app.use('/application', applicationRoutes);
 app.use('/profile', userProfileRoutes)
 app.use('/user', userRoutes);
 app.use ('/offer', offerRoutes);
-
+app.use('/faq', faqRoutes);
 
 app.use((req, res, next)=> {
     const error = new Error("Not found");

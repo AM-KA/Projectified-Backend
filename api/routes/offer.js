@@ -7,6 +7,7 @@ const Offer = require('../models/offer');
 const checkAuth = require('../middleware/check-auth');
 const Profile = require('../models/profile');
 const User = require('../models/user');
+const Application = require('../models/application');
 const { resource } = require('../../app');
 
 //  CANDIDATE OPTIONS
@@ -136,28 +137,28 @@ router.post('/', checkAuth, (req, res, next) => {
     });
 });
 
+
 /*
-    getOffersByRecruiter
+    getOffersByRecruiter (CardView)
 */
 router.get('/byRecruiter/:recruiterID', checkAuth, (req, res, next) => {
     const rec_id = req.params.recruiterID;
 
     Offer.find({recruiter_id : rec_id})
-    .then(result => {
+    .then(async result => {
         var vals = [];
         var performa = {
             offer_id:"",
-            requirements: "",
-            skills:"",
-            expectation:"",
-            is_visible: true
+            offer_name:"",
+            float_date:"",
+            no_of_applicants:""
         }
         for(i=0; i<result.length; i++){
+            const applicationArray = await Application.find({offer_id : result[i]._id});
             performa.offer_id = result[i]._id;
-            performa.requirements = result[i].requirements;
-            performa.skills = result[i].skills;
-            performa.expectation = result[i].expectation;
-            performa.is_visible = result[i].is_visible;
+            performa.offer_name = result[i].offer_name;
+            performa.float_date = result[i].float_date;
+            no_of_applicants = applicationArray.length;
             vals.push(performa);
         }
         res.status(200).json({
@@ -191,6 +192,49 @@ router.get('/byIdRecruiter/:offerID', checkAuth, (req, res, next) => {
             message: "Offers fetched successfully.",
             offers : performa
         });
+    });
+});
+
+
+
+/* 
+    getOfferApplicants (CARD VIEW)
+*/
+router.get('/:offerID/getApplicants', checkAuth, (req, res, next) => {
+    const off_id = req.params.offerID;
+
+    Application.find({_id : mongoose.Types.ObjectId(off_id)})
+    .then(result => {
+        var performa = {
+           college_name:"", 
+           is_Selected:"false",
+           date:"",
+           applicant_id="",
+           is_seen:"false",
+        };
+        if(result){
+            for(i=0; i<result.length; i++){
+                //Obtaining applicant profile  for CollegeName
+                const applicantProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(result.applicant_id) });
+                performa.college_name = applicantProfile.college_name;
+                performa.date=result.apply_date;
+                performa.applicant_id=result.applicant_id;
+                vals.push(performa)
+            }
+            res.status(200).json({
+                message : "Applications detail fetched successfully.",
+                offer : performa
+            });
+        }
+        else{
+            res.status(404).json({
+                message : "Not found."
+            });
+        }
+    })
+    .catch(err => {
+        console.log(err);
+        return res.status(500).json(err);
     });
 });
 

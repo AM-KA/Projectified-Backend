@@ -24,7 +24,7 @@ Offer:
         updateOffer                     Done    (Auth)
         deleteOffer                     Done    (Auth)
         toggleVisibility                Done    (Auth)
-        getOfferApplicants (CardView)   (  )    (Auth)  (Need applicant data)
+        getOfferApplicants (CardView)   Done    (Auth)  (Need applicant data)
 
     Master Options:
         getAllOffers                    Done
@@ -32,17 +32,17 @@ Offer:
 
 Application :
     Recruiter Options:
-        getApplicationById
-        markSeen
-        markSelected
+        getApplicationById      Done
+        markSeen                Done
+        markSelected            Done
     
-    Candidate Options:
-        addApplication                          DONE 
-        getApplicationsByCandidate (CardView)   DONE
-        getApplicationByIdCandidate (Detail)    DONE
-        updateApplication                       DONE
-        deleteApplication                       DONE
+    Candidate Options:  
+        addApplication                          Done
+        getApplicationsByCandidate (CardView)   Done
+        getApplicationByIdCandidate (Detail)    Done
+        updateApplication                       Done
+        deleteApplication                       Done
 
     Master Options:
-        getAllApplications
+        getAllApplications  Done
     

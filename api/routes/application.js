@@ -15,12 +15,12 @@ const { resource } = require('../../app');
 
 
 /*
-    add application
-                        */
+    addApplication
+*/
 
 router.post('/', checkAuth, (req, res, next) => {
     const date = new Date();
-    const application = new application({
+    const application = new Application({
         _id: mongoose.Types.ObjectId() ,
         apply_date: date,
         resume: req.body.resume,
@@ -29,7 +29,8 @@ router.post('/', checkAuth, (req, res, next) => {
         offer_id:mongoose.Types.ObjectId(req.body.offer_id),
         recruiter_id: mongoose.Types.ObjectId(req.body.recruiter_id)
     });
-    Application.save()
+
+    application.save()
     .then(result => {
         res.status(200).json({
             message: "Applied successfully",
@@ -42,10 +43,11 @@ router.post('/', checkAuth, (req, res, next) => {
     });
 });
 
+
 /*
     updateApplication
 */
-router.patch('/:applicantionID', checkAuth, (req, res, next) => {
+router.patch('/:applicationID', checkAuth, (req, res, next) => {
     const app_id = req.params.applicationID;
     Application
     .updateOne({_id : mongoose.Types.ObjectId(app_id)},
@@ -65,7 +67,6 @@ router.patch('/:applicantionID', checkAuth, (req, res, next) => {
         return res.status(500).json(err);
     });
 });
-
 
 
 /*
@@ -90,46 +91,46 @@ router.delete('/:application_id', checkAuth, (req, res, next) => {
 
 
 /*
-    getApplications-ByCandidate(CARD VIEW)
+    getApplicationsByCandidate(CARD VIEW)
 */
 router.get('/byApplicant/:applicantID', checkAuth, (req, res, next) => {
-    const appt_id = req.params.applicant                   //  appt =   applicant
+    const appt_id = req.params.applicantID                   //  appt =   applicant
     Application.find({applicant_id : appt_id})
     .then(async result  => {
         var vals = [];
         var performa = {
             offer_name:"",
-            allication_id:"",
+            application_id:"",
             college_name:"",
             float_date: "",
-            is_Seen:"false",
-            is_Selected:"false"
-           
+            is_Seen:"",
+            is_Selected:""
         }
         for(i=0; i<result.length; i++){
-            if(result)
-
-           //Obtaining offer Deatils for Offer Name and Offer date
-            const offer =await Offer.findOne({ _id: mongoose.Types.ObjectId(result.offer_id) });
+           //Obtaining offer Details for Offer Name and Offer date
+            const offer =await Offer.findOne({ _id: mongoose.Types.ObjectId(result[i].offer_id) });
 
              //Obtaining recruiter profile Recuriters CollegeName,
-            const recruiterProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(result.recruiter_id) });
+            const recruiterProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(result[i].recruiter_id) });
 
             performa.offer_name = offer.offer_name;
-            performa.float_date=offer.float_date;
-            performa.application_id=result._id
-            performa.college_name=recruiterProfile.college_name;
+            performa.float_date = offer.float_date;
+            performa.application_id = result[i]._id;
+            performa.college_name = recruiterProfile.college_name;
+            performa.is_Seen = result[i].is_Seen;
+            performa.is_Selected = result[i].is_Selected;
             vals.push(performa);
         }
         res.status(200).json({
             message: " All Application  fetched successfully.",
-            offers : vals
+            applications : vals
         });
     });
 });
 
+
 /*
-    getApplictionsById : Application detail page -( (Candidate Version)
+    getApplicationByIdCandidate
 */
 router.get('/:application_id', (req, res, next) => {
     const app_id = req.params.application_id;
@@ -140,16 +141,16 @@ router.get('/:application_id', (req, res, next) => {
         var performa = {
             requirements: "",
             skills:"",
-            markAsSeen:result.markAsSeen,
-            markAsSelected:result.markAsSelected,
+            markAsSeen: result.markAsSeen,
+            markAsSelected: result.markAsSelected,
             expectation:"",
             recruiter_name: "",
             recruiter_collegeName:"",
             recruiter_course:"",
             recruiter_semester:"",
             recruiter_phone:"",
-            previousWork:result.previousWork,
-            resume:result.resume
+            previousWork: result.previousWork,
+            resume: result.resume
         };
         if(result){
             //Obtaining recruiter profile for Name, CollegeName, Course and Semester
@@ -160,8 +161,6 @@ router.get('/:application_id', (req, res, next) => {
 
            //Obtaining Offers Details for reqirements and  Skills
            const offer = await Offer.findOne({ _id: mongoose.Types.ObjectId(result.offer_id) });
-
-
 
             //Setting Recruiter details
             performa.requirements=offer.requirements;
@@ -176,7 +175,7 @@ router.get('/:application_id', (req, res, next) => {
             //Sending full detailed response
             res.status(200).json({
                 message : "Application detail fetched successfully.",
-                offer : performa
+                application : performa
             });
         }
         else{
@@ -191,124 +190,209 @@ router.get('/:application_id', (req, res, next) => {
     });
 });
 
-   
-   //  RECURUITER OPTIONS 
 
 
-   /* 
-       getApplicationById -Recruiter Version (CARD VIEW)
-       */
- router.get('/ViewApplications/:offerID', checkAuth, (req, res, next) => {
-    const off_id = req.params.offerID;
-
-    Application.find({_id : mongoose.Types.ObjectId(off_id)})
-    .then(result => {
-        var performa = {
-           college_name:"", 
-           is_Selected:"false",
-           date:"",
-           applicant_id="",
-           is_seen:"false",
-        };
-        for(i=0; i<result.length; i++){
-            if(result){
-            //Obtaining applicant profile  for CollegeName
-            const applicantProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(result.applicant_id) });
-                performa.college_name = applicantProfile.college_name;
-                performa.date=result.apply_date;
-                performa.applicant_id=result.applicant_id;
-                vals.push(performa);
-            
-                res.status(200).json({
-                    message : "Applications detail fetched successfully.",
-                    offer : performa
-                });
-            }
-              else{
-                    res.status(404).json({
-                        message : "Not found."
-                    });
-                }
-            }
-        })
-            .catch(err => {
-                console.log(err);
-                return res.status(500).json(err);
-            });
-
-            
+//  RECRUITER OPTIONS 
 
 
-    /*
-    Seen Marked
+
+/*
+    getApplicationById
 */
-router.patch('/SeenMarked/:application_id', checkAuth, (req, res, next) => {
-    const app_id = req.params.applicantion_id;
-    Application.findOne({ _id : app_id})
+router.get('/byIdRecruiter/:application_id/', (req, res, next) => {
+    const app_id = req.params.application_id;
+    
+    Application.findOne({_id : app_id})
     .exec()
-    .then(result =>{
-     const seen=result.is_seen;
+    .then(async result =>{
+        var performa = {
+            markAsSeen: result.markAsSeen,
+            markAsSelected: result.markAsSelected,
+            applicant_name: "",
+            applicant_collegeName:"",
+            applicant_course:"",
+            applicant_semester:"",
+            applicant_phone:"",
+            previousWork: result.previousWork,
+            resume: result.resume
+        };
+        if(result){
+            //Obtaining recruiter profile for Name, CollegeName, Course and Semester
+            const applicantProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(result.applicant_id) });
 
-       if(seen == "false")
-      { Application.updateOne({ _id : app_id},
-        {
-            is_seen: req.body.markedSeen
-        })
-    .exec()
-    .then(result =>{
-        res.status(200).json({
-            message: "Seen Marked successfully."
-        });
+            //Obtaining Recruiter User detail for Phone Number
+            const applicantUser = await User.findOne({ _id: mongoose.Types.ObjectId(result.applicant_id) });
+
+           //Obtaining Offers Details for reqirements and  Skills
+           const offer = await Offer.findOne({ _id: mongoose.Types.ObjectId(result.offer_id) });
+
+            //Setting Recruiter details
+            performa.applicant_name = applicantProfile.name;
+            performa.applicant_collegeName = applicantProfile.collegeName;
+            performa.applicant_course = applicantProfile.course;
+            performa.applicant_semester = applicantProfile.semester;
+            performa.applicant_phone = applicantUser.phone;
+
+            //Sending full detailed response
+            res.status(200).json({
+                message : "Application detail fetched successfully.",
+                application : performa
+            });
+        }
+        else{
+            res.status(404).json({
+                message : "Not found."
+            });
+        }
     })
-
     .catch(err => {
         console.log(err);
         return res.status(500).json(err);
     });
-      
-    router.patch('/SelectedMarked/:application_id', checkAuth, (req, res, next) => {
-        const app_id = req.params.applicantion_id;
-        Application.findOne({ _id : app_id})
-        .exec()
-        .then(result =>{
-         const selected=result.is_seen;
-    
-           if(seen == "false")
-          { Application.updateOne({ _id : app_id},
+});
+
+
+/*
+    markSeen
+*/
+router.patch('/markSeen/:application_id', checkAuth, (req, res, next) => {
+    const app_id = req.params.application_id;
+
+    Application.findOne({ _id : app_id})
+    .exec()
+    .then(result =>{
+        const seen=result.is_seen;
+
+        if(seen == "false")
+        { 
+            Application.updateOne({ _id : app_id},
             {
                 is_seen: req.body.markedSeen
             })
-        .exec()
-        .then(result =>{
-            res.status(200).json({
-                message: "Seen Marked successfully."
-            });
-        })
-    }
-    })
-        .catch(err => {
-            console.log(err);
-            return res.status(500).json(err);
-        });
-    });
-          
-     
- router.post('/SeenMarked/:application_id', checkAuth, (req, res, next) => {
-            const app_id = req.paramsapplication_id;
-            Offer.updateOne({ _id : app_id},
-                {
-                    is_Selected: req.body.Selected
-                })
             .exec()
             .then(result =>{
                 res.status(200).json({
-                    message: "Application status changed successfully."
+                    message: "Seen Marked successfully."
                 });
             })
             .catch(err => {
                 console.log(err);
                 return res.status(500).json(err);
             });
-        });
-        
+        }
+    })
+    .catch(err => {
+        console.log(err);
+        return res.status(500).json(err);
+    });
+});
+
+
+/*
+    markSelected
+*/
+router.patch('/markSelected/:application_id', checkAuth, (req, res, next) => {
+    const app_id = req.params.application_id;
+
+    Application.findOne({ _id : app_id})
+    .exec()
+    .then(async result =>{
+        const selected=result.is_selected;
+    
+        if(selected == "false")
+        { 
+            await Application.updateOne({ _id : app_id},
+            {
+                is_selected: req.body.markedSelected
+            })
+            .exec()
+            .then(result =>{
+                res.status(200).json({
+                    message: "Selected Marked successfully."
+                });
+            })
+            .catch(err => {
+                console.log(err);
+                return res.status(500).json(err);
+            });        
+        }
+    })
+    .catch(err => {
+        console.log(err);
+        return res.status(500).json(err);
+    });
+
+});
+
+
+
+//MASTER OPTIONS
+
+
+/*
+    getAllApplications
+*/
+router.get('/', (req, res, next) => {
+    
+    Application.find()
+    .exec()
+    .then(async result =>{
+        var performa = {
+            requirements: "",
+            skills:"",
+            markAsSeen: result.markAsSeen,
+            markAsSelected: result.markAsSelected,
+            expectation:"",
+            recruiter_name: "",
+            recruiter_collegeName:"",
+            recruiter_course:"",
+            recruiter_semester:"",
+            recruiter_phone:"",
+            previousWork: result.previousWork,
+            resume: result.resume
+        };
+        if(result){
+            var vals = [];
+            for(i=0; i<result.length; i++){
+
+                //Obtaining recruiter profile for Name, CollegeName, Course and Semester
+                const recruiterProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(result.recruiter_id) });
+
+                //Obtaining Recruiter User detail for Phone Number
+                const recruiterUser = await User.findOne({ _id: mongoose.Types.ObjectId(result.recruiter_id) });
+
+                //Obtaining Offers Details for reqirements and  Skills
+                const offer = await Offer.findOne({ _id: mongoose.Types.ObjectId(result.offer_id) });
+
+                //Setting Recruiter details
+                performa.requirements=offer.requirements;
+                performa.skills=offer.skills;
+                performa.expectation=offer.expectation;
+                performa.recruiter_name = recruiterProfile.name;
+                performa.recruiter_collegeName = recruiterProfile.collegeName;
+                performa.recruiter_course = recruiterProfile.course;
+                performa.recruiter_semester = recruiterProfile.semester;
+                performa.recruiter_phone = recruiterUser.phone;
+
+                vals.push(performa);
+            }
+            //Sending full detailed response
+            res.status(200).json({
+                message : "Application detail fetched successfully.",
+                applications : vals
+            });
+        }
+        else{
+            res.status(404).json({
+                message : "Not found."
+            });
+        }
+    })
+    .catch(err => {
+        console.log(err);
+        return res.status(500).json(err);
+    });
+});
+
+
 module.exports = router;  
