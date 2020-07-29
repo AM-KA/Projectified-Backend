@@ -16,8 +16,8 @@ const { resource } = require('../../app');
 /*
     getOfferByDomain : For Candidate CardView
 */
-router.get('/byDomain/:domain_name', (req, res, next) => {
-    const dom_name = req.params.domain_name;
+router.get('/byDomain/:domainName', (req, res, next) => {
+    const dom_name = req.params.domainName;
     var performa = {
         offer_id: "",
         offer_name: "",
@@ -57,10 +57,10 @@ router.get('/byDomain/:domain_name', (req, res, next) => {
 /*
     getOfferById : Offer detail page - Candidate Version
 */
-router.get('/:offer_id', (req, res, next) => {
-    const off_id = req.params.offer_id;
+router.get('/:offerID', (req, res, next) => {
+    const off_id = req.params.offerID;
     
-    Offer.findOne({_id : off_id})
+    Offer.findOne({_id : mongoose.Types.ObjectId(off_id)})
     .exec()
     .then(async result =>{
         var performa = {
@@ -144,7 +144,7 @@ router.post('/', checkAuth, (req, res, next) => {
 router.get('/byRecruiter/:recruiterID', checkAuth, (req, res, next) => {
     const rec_id = req.params.recruiterID;
 
-    Offer.find({recruiter_id : rec_id})
+    Offer.find({recruiter_id : mongoose.Types.ObjectId(rec_id)})
     .then(async result => {
         var vals = [];
         var performa = {
@@ -169,7 +169,7 @@ router.get('/byRecruiter/:recruiterID', checkAuth, (req, res, next) => {
 });
 
 /*
-    getOffersByIdRecruiter
+    getOfferByIdRecruiter
 */
 router.get('/byIdRecruiter/:offerID', checkAuth, (req, res, next) => {
     const off_id = req.params.offerID;
@@ -190,7 +190,7 @@ router.get('/byIdRecruiter/:offerID', checkAuth, (req, res, next) => {
             performa.is_visible = result.is_visible;
         res.status(200).json({
             message: "Offers fetched successfully.",
-            offers : performa
+            offer : performa
         });
     });
 });
@@ -203,27 +203,32 @@ router.get('/byIdRecruiter/:offerID', checkAuth, (req, res, next) => {
 router.get('/:offerID/getApplicants', checkAuth, (req, res, next) => {
     const off_id = req.params.offerID;
 
-    Application.find({_id : mongoose.Types.ObjectId(off_id)})
+    Application.find({offer_id : mongoose.Types.ObjectId(off_id)})
     .then(result => {
         var performa = {
-           college_name:"", 
-           is_Selected:"false",
-           date:"",
-           applicant_id="",
-           is_seen:"false",
+            application_id:"",
+            college_name:"",
+            is_Seen:"", 
+            is_Selected:"",
+            date:"",
+            applicant_id:""
         };
+        var vals = [];
         if(result){
             for(i=0; i<result.length; i++){
                 //Obtaining applicant profile  for CollegeName
                 const applicantProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(result.applicant_id) });
+                performa.application_id = result[i]._id;
                 performa.college_name = applicantProfile.college_name;
+                performa.is_Seen = result[i].is_Seen;
+                performa.is_Selected = result[i].is_Selected;
                 performa.date=result.apply_date;
                 performa.applicant_id=result.applicant_id;
                 vals.push(performa)
             }
             res.status(200).json({
                 message : "Applications detail fetched successfully.",
-                offer : performa
+                applicants : vals
             });
         }
         else{
@@ -267,8 +272,8 @@ router.patch('/:offerID', checkAuth, (req, res, next) => {
 /*
     toggleVisibility
 */
-router.post('/toggle/:offer_id', checkAuth, (req, res, next) => {
-    const off_id = req.params.offer_id;
+router.post('/toggle/:offerID', checkAuth, (req, res, next) => {
+    const off_id = req.params.offerID;
     Offer.updateOne({ _id : off_id},
         {
             is_visible: req.body.visibility
@@ -289,8 +294,8 @@ router.post('/toggle/:offer_id', checkAuth, (req, res, next) => {
 /*
     deleteOffer
 */
-router.delete('/:offer_id', checkAuth, (req, res, next) => {
-    const off_id = req.params.offer_id;
+router.delete('/:offerID', checkAuth, (req, res, next) => {
+    const off_id = req.params.offerID;
     
     Offer
     .remove({_id : off_id})

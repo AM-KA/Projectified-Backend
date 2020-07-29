@@ -8,7 +8,6 @@ const checkAuth = require('../middleware/check-auth');
 const Profile = require('../models/profile');
 const User = require('../models/user');
 const Offer = require('../models/offer')
-const { resource } = require('../../app');
 
 
 //CANDIDATE OPTIONS 
@@ -34,7 +33,7 @@ router.post('/', checkAuth, (req, res, next) => {
     .then(result => {
         res.status(200).json({
             message: "Applied successfully",
-            apply_id : application._id
+            application_id : application._id
         });
     })
     .catch(err => {
@@ -49,6 +48,7 @@ router.post('/', checkAuth, (req, res, next) => {
 */
 router.patch('/:applicationID', checkAuth, (req, res, next) => {
     const app_id = req.params.applicationID;
+
     Application
     .updateOne({_id : mongoose.Types.ObjectId(app_id)},
     {$set : {
@@ -72,8 +72,8 @@ router.patch('/:applicationID', checkAuth, (req, res, next) => {
 /*
     deleteApplication
 */
-router.delete('/:application_id', checkAuth, (req, res, next) => {
-    const app_id = req.params.application_id;
+router.delete('/:applicationID', checkAuth, (req, res, next) => {
+    const app_id = req.params.applicationID;
     
     Application
     .remove({_id : app_id})
@@ -110,7 +110,7 @@ router.get('/byApplicant/:applicantID', checkAuth, (req, res, next) => {
            //Obtaining offer Details for Offer Name and Offer date
             const offer =await Offer.findOne({ _id: mongoose.Types.ObjectId(result[i].offer_id) });
 
-             //Obtaining recruiter profile Recuriters CollegeName,
+             //Obtaining recruiter profile for Recruiter's CollegeName,
             const recruiterProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(result[i].recruiter_id) });
 
             performa.offer_name = offer.offer_name;
@@ -132,8 +132,8 @@ router.get('/byApplicant/:applicantID', checkAuth, (req, res, next) => {
 /*
     getApplicationByIdCandidate
 */
-router.get('/:application_id', (req, res, next) => {
-    const app_id = req.params.application_id;
+router.get('/:applicationID', (req, res, next) => {
+    const app_id = req.params.applicationID;
     
     Application.findOne({_id : app_id})
     .exec()
@@ -199,8 +199,8 @@ router.get('/:application_id', (req, res, next) => {
 /*
     getApplicationById
 */
-router.get('/byIdRecruiter/:application_id/', (req, res, next) => {
-    const app_id = req.params.application_id;
+router.get('/byIdRecruiter/:applicationID', (req, res, next) => {
+    const app_id = req.params.applicationID;
     
     Application.findOne({_id : app_id})
     .exec()
@@ -222,9 +222,6 @@ router.get('/byIdRecruiter/:application_id/', (req, res, next) => {
 
             //Obtaining Recruiter User detail for Phone Number
             const applicantUser = await User.findOne({ _id: mongoose.Types.ObjectId(result.applicant_id) });
-
-           //Obtaining Offers Details for reqirements and  Skills
-           const offer = await Offer.findOne({ _id: mongoose.Types.ObjectId(result.offer_id) });
 
             //Setting Recruiter details
             performa.applicant_name = applicantProfile.name;
@@ -255,8 +252,8 @@ router.get('/byIdRecruiter/:application_id/', (req, res, next) => {
 /*
     markSeen
 */
-router.patch('/markSeen/:application_id', checkAuth, (req, res, next) => {
-    const app_id = req.params.application_id;
+router.patch('/markSeen/:applicationID', checkAuth, (req, res, next) => {
+    const app_id = req.params.applicationID;
 
     Application.findOne({ _id : app_id})
     .exec()
@@ -291,15 +288,15 @@ router.patch('/markSeen/:application_id', checkAuth, (req, res, next) => {
 /*
     markSelected
 */
-router.patch('/markSelected/:application_id', checkAuth, (req, res, next) => {
-    const app_id = req.params.application_id;
+router.patch('/markSelected/:applicationID', checkAuth, (req, res, next) => {
+    const app_id = req.params.applicationID;
 
     Application.findOne({ _id : app_id})
     .exec()
     .then(async result =>{
-        const selected=result.is_selected;
+        const selected=result.is_Selected;
     
-        if(selected == "false")
+        if(selected == false)
         { 
             await Application.updateOne({ _id : app_id},
             {

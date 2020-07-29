@@ -16,14 +16,14 @@ const applicationSchema = mongoose.Schema({
     },
     is_Seen:{
 
-        boolean:false,
-        default:true
+        type: Boolean,
+        default:false
     
     },
     is_Selected:{
 
-        boolean:false,
-        default:true
+        type: Boolean,
+        default:false
     
     },  
     offer_id:   mongoose.Schema.Types.ObjectId,

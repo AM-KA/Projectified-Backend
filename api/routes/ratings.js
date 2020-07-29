@@ -9,9 +9,10 @@ const Profile = require('../models/profile');
 const User = require('../models/user');
 const Offer = require('../models/offer')
 const Ratings = require('../models/ratings')
-const { resource } = require('../../app');
 
-
+/*
+    addRating
+*/
 router.post('/', checkAuth, (req, res, next) => {
     const date = new Date();
     const ratings= new Ratings({
@@ -36,9 +37,12 @@ router.post('/', checkAuth, (req, res, next) => {
 });
 
 
-router.get('/ratings', checkAuth, (req, res, next) => {
+/*
+    getAllRatings
+*/
+router.get('/', checkAuth, (req, res, next) => {
 
-    Ratings.find.
+    Ratings.find().
     exec()
     .then(async result => {
         var vals = [];
@@ -62,11 +66,14 @@ router.get('/ratings', checkAuth, (req, res, next) => {
     });
 });
 
-router.patch('/rating/:applicant_ID', checkAuth, (req, res, next) => {
-    const appt_id = req.params.applicant_ID;
+/*
+    updateRating
+*/
+router.patch('/:ratingID', checkAuth, (req, res, next) => {
+    const rating_id = req.params.ratingID;
     
     Ratings
-    .updateOne({_id : mongoose.Types.ObjectId(appt_id)},
+    .updateOne({_id : mongoose.Types.ObjectId(rating_id)},
     {$set : {
         rating: req.body.rating,
         any_suggestions: req.body.any_suggestions
@@ -74,7 +81,7 @@ router.patch('/rating/:applicant_ID', checkAuth, (req, res, next) => {
     }})
     .then(result => {
         res.status(200).json({
-            message : "Ratings details updated successfully."
+            message : "Rating updated successfully."
         })
     })
     .catch(err => {
@@ -83,9 +90,4 @@ router.patch('/rating/:applicant_ID', checkAuth, (req, res, next) => {
     });
 });
 
-
-
-
-
-
-
+module.exports = router;

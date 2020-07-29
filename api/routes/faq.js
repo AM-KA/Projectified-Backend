@@ -53,7 +53,7 @@ router.post('/', (request, response, next) => {
 
 
 /*
-    editFaqById
+    updateFaqById
 */
 router.patch('/:faqID', (request, response, next) => {
     const faq_id = request.params.faqID;
@@ -70,7 +70,7 @@ router.patch('/:faqID', (request, response, next) => {
         .then(result => {
             response.status(200).json({
                 message:"Item updated successfully."
-            })
+            });
         })
         .catch(err => {
             console.log(err);
@@ -90,7 +90,7 @@ router.delete('/:faqID', (request, response, next) => {
         .then(result => {
             response.status(200).json({
                 message:"Item deleted successfully."
-            })
+            });
         })
         .catch(err => {
             console.log(err);

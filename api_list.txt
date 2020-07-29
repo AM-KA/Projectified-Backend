@@ -2,7 +2,7 @@ User :
     signUp          Done
     logIn           Done
     createProfile   Done
-    updateProfile       
+    updateProfile         
 
     Master Options:
         getAllUsers         Done
@@ -19,7 +19,7 @@ Offer:
 
     Recruiter Options:
         addOffer                        Done    (Auth)
-        getOffersByRecruiter (CardView)         (Auth)  (Need number of applicants)
+        getOffersByRecruiter (CardView) Done    (Auth)  (Need number of applicants)
         getOfferByIdRecruiter           Done    (Auth)       
         updateOffer                     Done    (Auth)
         deleteOffer                     Done    (Auth)
