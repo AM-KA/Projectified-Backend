@@ -93,7 +93,7 @@ router.delete('/:applicationID', checkAuth, (req, res, next) => {
 /*
     getApplicationsByCandidate(CARD VIEW)
 */
-router.get('/byApplicant/:applicantID', checkAuth, (req, res, next) => {
+router.get('/:applicantID', checkAuth, (req, res, next) => {
     const appt_id = req.params.applicantID                   //  appt =   applicant
     Application.find({applicant_id : appt_id})
     .then(async result  => {
@@ -132,7 +132,7 @@ router.get('/byApplicant/:applicantID', checkAuth, (req, res, next) => {
 /*
     getApplicationByIdCandidate
 */
-router.get('/:applicationID', (req, res, next) => {
+router.get('/:applicationID/candidate', (req, res, next) => {
     const app_id = req.params.applicationID;
     
     Application.findOne({_id : app_id})
@@ -199,7 +199,7 @@ router.get('/:applicationID', (req, res, next) => {
 /*
     getApplicationById
 */
-router.get('/byIdRecruiter/:applicationID', (req, res, next) => {
+router.get('/:applicationID/recruiter', (req, res, next) => {
     const app_id = req.params.applicationID;
     
     Application.findOne({_id : app_id})
@@ -252,7 +252,7 @@ router.get('/byIdRecruiter/:applicationID', (req, res, next) => {
 /*
     markSeen
 */
-router.patch('/markSeen/:applicationID', checkAuth, (req, res, next) => {
+router.patch('/:applicationID/seen', checkAuth, (req, res, next) => {
     const app_id = req.params.applicationID;
 
     Application.findOne({ _id : app_id})
@@ -288,7 +288,7 @@ router.patch('/markSeen/:applicationID', checkAuth, (req, res, next) => {
 /*
     markSelected
 */
-router.patch('/markSelected/:applicationID', checkAuth, (req, res, next) => {
+router.patch('/:applicationID/selected', checkAuth, (req, res, next) => {
     const app_id = req.params.applicationID;
 
     Application.findOne({ _id : app_id})

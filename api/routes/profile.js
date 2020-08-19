@@ -30,7 +30,7 @@ router.post('/', checkAuth, (req, res, next) => {
     .then(result => {
         res.status(200).json({
             message: "Profile Created Succesfully",
-            user_id : result._id
+            profile_id : result._id
         });
     })
     .catch(err => {

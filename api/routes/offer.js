@@ -16,7 +16,7 @@ const { resource } = require('../../app');
 /*
     getOfferByDomain : For Candidate CardView
 */
-router.get('/byDomain/:domainName', (req, res, next) => {
+router.get('/:domainName', (req, res, next) => {
     const dom_name = req.params.domainName;
     var performa = {
         offer_id: "",
@@ -57,7 +57,7 @@ router.get('/byDomain/:domainName', (req, res, next) => {
 /*
     getOfferById : Offer detail page - Candidate Version
 */
-router.get('/:offerID', (req, res, next) => {
+router.get('/:offerID/candidate', (req, res, next) => {
     const off_id = req.params.offerID;
     
     Offer.findOne({_id : mongoose.Types.ObjectId(off_id)})
@@ -141,7 +141,7 @@ router.post('/', checkAuth, (req, res, next) => {
 /*
     getOffersByRecruiter (CardView)
 */
-router.get('/byRecruiter/:recruiterID', checkAuth, (req, res, next) => {
+router.get('/recruiter/:recruiterID', checkAuth, (req, res, next) => {
     const rec_id = req.params.recruiterID;
 
     Offer.find({recruiter_id : mongoose.Types.ObjectId(rec_id)})
@@ -171,7 +171,7 @@ router.get('/byRecruiter/:recruiterID', checkAuth, (req, res, next) => {
 /*
     getOfferByIdRecruiter
 */
-router.get('/byIdRecruiter/:offerID', checkAuth, (req, res, next) => {
+router.get('/:offerID/recruiter', checkAuth, (req, res, next) => {
     const off_id = req.params.offerID;
 
     Offer.findOne({_id : mongoose.Types.ObjectId(off_id)})
@@ -200,7 +200,7 @@ router.get('/byIdRecruiter/:offerID', checkAuth, (req, res, next) => {
 /* 
     getOfferApplicants (CARD VIEW)
 */
-router.get('/:offerID/getApplicants', checkAuth, (req, res, next) => {
+router.get('/:offerID/applicants', checkAuth, (req, res, next) => {
     const off_id = req.params.offerID;
 
     Application.find({offer_id : mongoose.Types.ObjectId(off_id)})
@@ -272,7 +272,7 @@ router.patch('/:offerID', checkAuth, (req, res, next) => {
 /*
     toggleVisibility
 */
-router.post('/toggle/:offerID', checkAuth, (req, res, next) => {
+router.post('/:offerID/toggle', checkAuth, (req, res, next) => {
     const off_id = req.params.offerID;
     Offer.updateOne({ _id : off_id},
         {

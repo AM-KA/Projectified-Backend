@@ -11,7 +11,7 @@ const FAQ = require('../models/faq');
 */
 router.get('/', (request, response, next) => {
     FAQ
-    .find()
+    .find({answered: true})
     .then(result => {
         res.status(200).json({
             message: "Items fetched successfully.",
@@ -34,7 +34,6 @@ router.post('/', (request, response, next) => {
     const faq = new FAQ({
         _id: mongoose.Types.ObjectId(),
         question: request.body.question,
-        answer: request.body.answer
     });
 
     faq

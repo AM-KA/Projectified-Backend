@@ -8,7 +8,11 @@ const faqSchema = mongoose.Schema({
     },
     answer: {
         type: String,
-        required:true
+        default: "Not yet answered."
+    },
+    answered:{
+        type: Boolean,
+        default: false
     }
 });
 
