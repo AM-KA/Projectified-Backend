@@ -204,7 +204,7 @@ router.get('/:offerID/applicants', checkAuth, (req, res, next) => {
     const off_id = req.params.offerID;
 
     Application.find({offer_id : mongoose.Types.ObjectId(off_id)})
-    .then(result => {
+    .then(async result => {
         var performa = {
             application_id:"",
             college_name:"",

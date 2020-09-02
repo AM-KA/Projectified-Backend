@@ -13,14 +13,13 @@ router.get('/', (request, response, next) => {
     FAQ
     .find({answered: true})
     .then(result => {
-        res.status(200).json({
-            message: "Items fetched successfully.",
-            items: result
+        response.status(200).json({
+            faqList: result
         });
     })
     .catch(err => {
         console.log(err);
-        res.status(500).json({
+        response.status(500).json({
             error:err
         });
     });
@@ -40,6 +39,7 @@ router.post('/', (request, response, next) => {
     .save()
     .then(result => {
         response.status(200).json({
+            code: "200",
             message: "Item added successfully."
         });
     })
@@ -63,7 +63,8 @@ router.patch('/:faqID', (request, response, next) => {
         },
         {
             question: request.body.question,
-            answer: request.body.answer
+            answer: request.body.answer,
+            answered:request.body.answered
         })
         .exec()
         .then(result => {
@@ -95,6 +96,22 @@ router.delete('/:faqID', (request, response, next) => {
             console.log(err);
             return res.status(500).json(err);
         });
+});
+
+router.get('/all', (request, response, next) => {
+    FAQ
+    .find()
+    .then(result => {
+        response.status(200).json({
+            faqList: result
+        });
+    })
+    .catch(err => {
+        console.log(err);
+        response.status(500).json({
+            error:err
+        });
+    });
 });
 
 module.exports = router;
