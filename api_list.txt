@@ -45,4 +45,9 @@ Application :
 
     Master Options:
         getAllApplications  Done
+
+FAQ:
+    User:
+        getAllFaq           Done
+        addQuestion         Done
     

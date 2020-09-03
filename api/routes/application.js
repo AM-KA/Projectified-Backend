@@ -52,14 +52,12 @@ router.patch('/:applicationID', checkAuth, (req, res, next) => {
     Application
     .updateOne({_id : mongoose.Types.ObjectId(app_id)},
     {$set : {
-
         resume: req.body.resume,
         previousWork: req.body.previousWork,
-       
     }})
     .then(result =>{
         res.status(200).json({
-            message : "Application details updated successfully."
+            message : "Application updated successfully."
         })
     })
     .catch(err => {
@@ -76,7 +74,7 @@ router.delete('/:applicationID', checkAuth, (req, res, next) => {
     const app_id = req.params.applicationID;
     
     Application
-    .remove({_id : app_id})
+    .remove({_id :  mongoose.Types.ObjectId(app_id)})
     .exec()
     .then(result =>{
         res.status(200).json({
@@ -95,13 +93,13 @@ router.delete('/:applicationID', checkAuth, (req, res, next) => {
 */
 router.get('/:applicantID', checkAuth, (req, res, next) => {
     const appt_id = req.params.applicantID                   //  appt =   applicant
-    Application.find({applicant_id : appt_id})
+    Application.find({applicant_id :  mongoose.Types.ObjectId(appt_id)})
     .then(async result  => {
         var vals = [];
         var performa = {
             offer_name:"",
             application_id:"",
-            college_name:"",
+            collegeName:"",
             float_date: "",
             is_Seen:"",
             is_Selected:""
@@ -116,13 +114,13 @@ router.get('/:applicantID', checkAuth, (req, res, next) => {
             performa.offer_name = offer.offer_name;
             performa.float_date = offer.float_date;
             performa.application_id = result[i]._id;
-            performa.college_name = recruiterProfile.college_name;
+            performa.collegeName = recruiterProfile.collegeName;
             performa.is_Seen = result[i].is_Seen;
             performa.is_Selected = result[i].is_Selected;
             vals.push(performa);
         }
         res.status(200).json({
-            message: " All Application  fetched successfully.",
+            message: " All Applications fetched successfully.",
             applications : vals
         });
     });
@@ -135,14 +133,14 @@ router.get('/:applicantID', checkAuth, (req, res, next) => {
 router.get('/:applicationID/candidate', (req, res, next) => {
     const app_id = req.params.applicationID;
     
-    Application.findOne({_id : app_id})
+    Application.findOne({_id :  mongoose.Types.ObjectId(app_id)})
     .exec()
     .then(async result =>{
         var performa = {
             requirements: "",
             skills:"",
-            markAsSeen: result.markAsSeen,
-            markAsSelected: result.markAsSelected,
+            is_Seen: result.is_Seen,
+            is_Selected: result.is_Selected,
             expectation:"",
             recruiter_name: "",
             recruiter_collegeName:"",
@@ -202,12 +200,12 @@ router.get('/:applicationID/candidate', (req, res, next) => {
 router.get('/:applicationID/recruiter', (req, res, next) => {
     const app_id = req.params.applicationID;
     
-    Application.findOne({_id : app_id})
+    Application.findOne({_id :  mongoose.Types.ObjectId(app_id)})
     .exec()
     .then(async result =>{
         var performa = {
-            markAsSeen: result.markAsSeen,
-            markAsSelected: result.markAsSelected,
+            is_Seen: result.is_Seen,
+            is_Selected: result.is_Selected,
             applicant_name: "",
             applicant_collegeName:"",
             applicant_course:"",
@@ -255,26 +253,34 @@ router.get('/:applicationID/recruiter', (req, res, next) => {
 router.patch('/:applicationID/seen', checkAuth, (req, res, next) => {
     const app_id = req.params.applicationID;
 
-    Application.findOne({ _id : app_id})
+    Application
+    .findOne({ _id :  mongoose.Types.ObjectId(app_id)})
     .exec()
     .then(result =>{
-        const seen=result.is_seen;
+        const seen=result.is_Seen;
 
         if(seen == "false")
         { 
-            Application.updateOne({ _id : app_id},
+            Application
+            .updateOne({ 
+                _id : mongoose.Types.ObjectId(app_id)
+            },
             {
-                is_seen: req.body.markedSeen
+                is_Seen: req.body.markedSeen
             })
             .exec()
             .then(result =>{
                 res.status(200).json({
-                    message: "Seen Marked successfully."
+                    message: "Marked as seen successfully."
                 });
             })
             .catch(err => {
                 console.log(err);
                 return res.status(500).json(err);
+            });
+        } else{
+            res.status(200).json({
+                message: "Application already seen."
             });
         }
     })
@@ -291,27 +297,31 @@ router.patch('/:applicationID/seen', checkAuth, (req, res, next) => {
 router.patch('/:applicationID/selected', checkAuth, (req, res, next) => {
     const app_id = req.params.applicationID;
 
-    Application.findOne({ _id : app_id})
+    Application.findOne({ _id : mongoose.Types.ObjectId(app_id)})
     .exec()
     .then(async result =>{
         const selected=result.is_Selected;
     
         if(selected == false)
         { 
-            await Application.updateOne({ _id : app_id},
+            await Application.updateOne({ _id :  mongoose.Types.ObjectId(app_id)},
             {
-                is_selected: req.body.markedSelected
+                is_Selected: req.body.markedSelected
             })
             .exec()
             .then(result =>{
                 res.status(200).json({
-                    message: "Selected Marked successfully."
+                    message: "Marked as selected successfully."
                 });
             })
             .catch(err => {
                 console.log(err);
                 return res.status(500).json(err);
             });        
+        }else{
+            res.status(200).json({
+                message: "Candidate already selected."
+            });
         }
     })
     .catch(err => {
@@ -375,7 +385,7 @@ router.get('/', (req, res, next) => {
             }
             //Sending full detailed response
             res.status(200).json({
-                message : "Application detail fetched successfully.",
+                message : "All Applications fetched successfully.",
                 applications : vals
             });
         }
@@ -390,6 +400,5 @@ router.get('/', (req, res, next) => {
         return res.status(500).json(err);
     });
 });
-
 
 module.exports = router;  
