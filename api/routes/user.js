@@ -90,7 +90,8 @@ router.post('/login', (req, res, next) => {
                         userID : user[0]._id,
                         token : tok,
                         userName: profile.name,
-                        profileCompleted : true
+                        profileCompleted : true,
+                        profile : profile
                     });
                 }else{
                     return res.status(200).json({
@@ -98,7 +99,8 @@ router.post('/login', (req, res, next) => {
                         userID : user[0]._id,
                         token : tok,
                         userName: null,
-                        profileCompleted : false
+                        profileCompleted : false,
+                        profile: null
                     });
                 }
             }
