@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
+const Profile = require('../models/profile');
 const checkAuth = require('../middleware/check-auth');
 
 /*
@@ -81,12 +82,25 @@ router.post('/login', (req, res, next) => {
                 {
                     expiresIn : "1h"
                 });
-                
-                return res.status(200).json({
-                    message : "Login successful",
-                    userID : user[0]._id,
-                    token : tok
-                });
+                const profile = await Profile.findOne({_id: user[0]._id});
+                var profileCompl = (profile==null);
+                if(profileCompl){
+                    return res.status(200).json({
+                        message : "Login successful",
+                        userID : user[0]._id,
+                        token : tok,
+                        userName: profile.name,
+                        profileCompleted : true
+                    });
+                }else{
+                    return res.status(200).json({
+                        message : "Login successful",
+                        userID : user[0]._id,
+                        token : tok,
+                        userName: null,
+                        profileCompleted : false
+                    });
+                }
             }
             else{
                 return res.status(401).json({
