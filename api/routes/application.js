@@ -109,7 +109,7 @@ router.get('/:applicantID', checkAuth, (req, res, next) => {
             const offer =await Offer.findOne({ _id: mongoose.Types.ObjectId(result[i].offer_id) });
 
              //Obtaining recruiter profile for Recruiter's CollegeName,
-            const recruiterProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(result[i].recruiter_id) });
+            const recruiterProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(offer.recruiter_id) });
 
             performa.offer_name = offer.offer_name;
             performa.float_date = offer.float_date;
