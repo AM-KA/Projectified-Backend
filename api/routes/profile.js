@@ -15,6 +15,7 @@ router.post('/', checkAuth, (req, res, next) => {
         name: req.body.name,
         date: date,
         collegeName: req.body.collegeName,
+        course: req.body.course,
         semester: req.body.semester,
         languages: req.body.languages,
         interest1: req.body.interest1,
@@ -24,7 +25,7 @@ router.post('/', checkAuth, (req, res, next) => {
         description: req.body.description,
        
     });
-
+    console.log(profile);
     profile
     .save()
     .then(result => {

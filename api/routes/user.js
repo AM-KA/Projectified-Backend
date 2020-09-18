@@ -86,8 +86,10 @@ router.post('/login', (req, res, next) => {
                 {
                     expiresIn : "1h"
                 });
+                console.log(user[0]._id);
                 const profile = await Profile.findOne({_id: user[0]._id});
-                var profileCompl = (profile==null);
+                var profileCompl = (profile!=null);
+                console.log(profileCompl);
                 if(profileCompl){
                     return res.status(200).json({
                         code:200,
@@ -111,7 +113,7 @@ router.post('/login', (req, res, next) => {
                 }
             }
             else{
-                return res.status(401).json({
+                return res.status(200).json({
                     code:401,
                     message : "Auth failed"
                 });

@@ -14,7 +14,7 @@ const { resource } = require('../../app');
 
 
 /*
-    getOfferByDomain : For Candidate CardView
+    getOffersByDomain : For Candidate CardView
     Response:   message:String
                 offers:[{
                     offer_id=MongooseID
@@ -49,6 +49,7 @@ router.get('/:domainName', (req, res, next) => {
             performa.collegeName = recruiterProfile.collegeName;
             vals.push(performa);
         }
+        console.log(vals);
         res.status(200).json({
             message : "Offers fetched successfully.",
             offers: vals
@@ -390,4 +391,11 @@ router.get('/', (req, res, next) => {
     });
 });
 
+router.delete('/', checkAuth, (req, res, next)=>{
+    Offer.deleteMany().exec()
+    .then( result => {
+        return res.status(200).json({message: "Done successfully!"})
+    })
+    .catch();
+});
 module.exports = router;
