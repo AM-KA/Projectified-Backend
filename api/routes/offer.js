@@ -26,22 +26,20 @@ const { resource } = require('../../app');
 */
 router.get('/:domainName', (req, res, next) => {
     const dom_name = req.params.domainName;
-    var performa = {
-        offer_id: "",
-        offer_name: "",
-        skills: "",
-        float_date:"",
-        collegeName:""
-    };
-
-
     Offer.find({domain_name: dom_name})
     .exec()
     .then(async result => {
-        var vals = [];
+        var vals = Array();
         for(i=0; i<result.length; i++){
             const offer = result[i];
             const recruiterProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(offer.recruiter_id) });
+            const performa = {
+                offer_id: "",
+                offer_name: "",
+                skills: "",
+                float_date:"",
+                collegeName:""
+            };
             performa.offer_id = offer._id;
             performa.offer_name = offer.offer_name;
             performa.skills = offer.skills;
@@ -185,14 +183,14 @@ router.get('/recruiter/:recruiterID', checkAuth, (req, res, next) => {
     Offer.find({recruiter_id : mongoose.Types.ObjectId(rec_id)})
     .then(async result => {
         var vals = [];
-        var performa = {
-            offer_id:"",
-            offer_name:"",
-            float_date:"",
-            no_of_applicants:""
-        }
         for(i=0; i<result.length; i++){
             const applicationArray = await Application.find({offer_id : result[i]._id});
+            var performa = {
+                offer_id:"",
+                offer_name:"",
+                float_date:"",
+                no_of_applicants:""
+            }
             performa.offer_id = result[i]._id;
             performa.offer_name = result[i].offer_name;
             performa.float_date = result[i].float_date;
@@ -238,7 +236,7 @@ router.get('/:offerID/recruiter', checkAuth, (req, res, next) => {
             performa.expectation = result.expectation;
             performa.is_visible = result.is_visible;
         res.status(200).json({
-            message: "Offers fetched successfully.",
+            message: "Offer fetched successfully.",
             offer : performa
         });
     });
@@ -314,11 +312,12 @@ router.patch('/:offerID', checkAuth, (req, res, next) => {
     const off_id = req.params.offerID;
     Offer
     .updateOne({_id : mongoose.Types.ObjectId(off_id)},
-    {$set : {
+    {
+        offer_name:req.body.offer_name,
         requirements: req.body.requirements,
         skills: req.body.skills,
         expectation: req.body.expectation
-    }})
+    })
     .then(result => {
         res.status(200).json({
             message : "Offer details updated successfully."
@@ -363,7 +362,7 @@ router.delete('/:offerID', checkAuth, (req, res, next) => {
     const off_id = req.params.offerID;
     
     Offer
-    .remove({_id : off_id})
+    .deleteOne({_id : off_id})
     .exec()
     .then(result =>{
         res.status(200).json({
@@ -391,7 +390,7 @@ router.get('/', (req, res, next) => {
     });
 });
 
-router.delete('/', checkAuth, (req, res, next)=>{
+router.delete('/', (req, res, next)=>{
     Offer.deleteMany().exec()
     .then( result => {
         return res.status(200).json({message: "Done successfully!"})
