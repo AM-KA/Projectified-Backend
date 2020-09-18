@@ -17,7 +17,8 @@ router.post('/signup', (req, res, next) =>{
     .exec()
     .then(user => {
         if(user.length >= 1)
-            return res.status(422).json({
+            return res.status(200).json({
+                code:422,
                 message: "Mail exists!"
             });
         else{
@@ -35,7 +36,8 @@ router.post('/signup', (req, res, next) =>{
                         .save()
                         .then(result => {
                             console.log(result);
-                            res.status(201).json({
+                            res.status(200).json({
+                                code:200,
                                 message: 'User created'
                             });
                         })
@@ -62,14 +64,16 @@ router.post('/login', (req, res, next) => {
     .exec()
     .then(user => {
         if(user.length < 1){
-            return res.status(404).json({
+            return res.status(200).json({
+                code:404,
                 message : "Authorisation failed"
             });
         }
 
-        bcrypt.compare(req.body.password, user[0].password, (err, result) => {
+        bcrypt.compare(req.body.password, user[0].password, async (err, result) => {
             if(err){
-                return res.status(401).json({
+                return res.status(200).json({
+                    code:401,
                     message : "Auth failed"
                 });
             }
@@ -86,6 +90,7 @@ router.post('/login', (req, res, next) => {
                 var profileCompl = (profile==null);
                 if(profileCompl){
                     return res.status(200).json({
+                        code:200,
                         message : "Login successful",
                         userID : user[0]._id,
                         token : tok,
@@ -95,6 +100,7 @@ router.post('/login', (req, res, next) => {
                     });
                 }else{
                     return res.status(200).json({
+                        code:200,
                         message : "Login successful",
                         userID : user[0]._id,
                         token : tok,
@@ -106,6 +112,7 @@ router.post('/login', (req, res, next) => {
             }
             else{
                 return res.status(401).json({
+                    code:401,
                     message : "Auth failed"
                 });
             }
@@ -149,7 +156,10 @@ router.get('/', (req, res, next) => {
 router.delete('/', checkAuth, (req, res, next) => {
     User.deleteMany().exec()
     .then(result => {
-        res.status(200).json({message : "Delete success"});
+        res.status(200).json({
+            code:200,
+            message : "Delete success"
+        });
     })
     .catch(err => {
         console.log(err);
