@@ -252,7 +252,6 @@ router.patch('/:offerID', checkAuth, (req, res, next) => {
     Offer
     .updateOne({_id : mongoose.Types.ObjectId(off_id)},
     {$set : {
-        offer_name: req.body.offer_name,
         requirements: req.body.requirements,
         skills: req.body.skills,
         expectation: req.body.expectation
