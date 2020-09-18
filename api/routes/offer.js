@@ -15,6 +15,14 @@ const { resource } = require('../../app');
 
 /*
     getOfferByDomain : For Candidate CardView
+    Response:   message:String
+                offers:[{
+                    offer_id=MongooseID
+                    offer_name=String
+                    skills=String
+                    float_date=Date(ISO)
+                    collegeName=String
+                }]
 */
 router.get('/:domainName', (req, res, next) => {
     const dom_name = req.params.domainName;
@@ -56,6 +64,19 @@ router.get('/:domainName', (req, res, next) => {
 
 /*
     getOfferById : Offer detail page - Candidate Version
+    Response:{
+        message:String
+        offer:{
+            requirements=String
+            skills=String
+            expectation=String
+            recruiter_name=String
+            recruiter_collegeName=String
+            recruiter_course=String
+            recruiter_semester=String
+            recruiter_phone=String
+        }
+    }
 */
 router.get('/:offerID/candidate', (req, res, next) => {
     const off_id = req.params.offerID;
@@ -110,7 +131,16 @@ router.get('/:offerID/candidate', (req, res, next) => {
 
 
 /*
-    addOffer
+    addOffer    
+    Request:    offer_name
+                domain_name
+                requirements
+                skills
+                expectation
+                recruiter_id
+
+    Response    message=String
+                job_id=String (MongooseID)
 */
 router.post('/', checkAuth, (req, res, next) => {
     const date = new Date();
@@ -140,6 +170,13 @@ router.post('/', checkAuth, (req, res, next) => {
 
 /*
     getOffersByRecruiter (CardView)
+    Response:   message:String
+                offers:[{
+                    offer_id
+                    offer_name
+                    float_date
+                    no_of_applicants
+                }]
 */
 router.get('/recruiter/:recruiterID', checkAuth, (req, res, next) => {
     const rec_id = req.params.recruiterID;
@@ -158,7 +195,7 @@ router.get('/recruiter/:recruiterID', checkAuth, (req, res, next) => {
             performa.offer_id = result[i]._id;
             performa.offer_name = result[i].offer_name;
             performa.float_date = result[i].float_date;
-            no_of_applicants = applicationArray.length;
+            performa.no_of_applicants = applicationArray.length;
             vals.push(performa);
         }
         res.status(200).json({
@@ -170,6 +207,15 @@ router.get('/recruiter/:recruiterID', checkAuth, (req, res, next) => {
 
 /*
     getOfferByIdRecruiter
+    Response:   message=String
+                offer:{
+                    offer_id=String
+                    offer_name=String
+                    requirements:String
+                    skills:String
+                    expectation:String
+                    is_visible:Boolean
+                }
 */
 router.get('/:offerID/recruiter', checkAuth, (req, res, next) => {
     const off_id = req.params.offerID;
@@ -178,12 +224,14 @@ router.get('/:offerID/recruiter', checkAuth, (req, res, next) => {
     .then(result => {
         var performa = {
             offer_id:"",
+            offer_name:"",
             requirements: "",
             skills:"",
             expectation:"",
             is_visible: true
         }
             performa.offer_id = result._id;
+            performa.offer_name = result.offer_name;
             performa.requirements = result.requirements;
             performa.skills = result.skills;
             performa.expectation = result.expectation;
@@ -199,15 +247,24 @@ router.get('/:offerID/recruiter', checkAuth, (req, res, next) => {
 
 /* 
     getOfferApplicants (CARD VIEW)
+    Response:   message=String
+                applicants:[{
+                    application_id=String
+                    collegeName=String
+                    is_Seen=String
+                    is_Selected=String
+                    date=Date(ISO)
+                    applicant_id=String
+                }]
 */
 router.get('/:offerID/applicants', checkAuth, (req, res, next) => {
     const off_id = req.params.offerID;
 
     Application.find({offer_id : mongoose.Types.ObjectId(off_id)})
-    .then(result => {
+    .then(async result => {
         var performa = {
             application_id:"",
-            college_name:"",
+            collegeName:"",
             is_Seen:"", 
             is_Selected:"",
             date:"",
@@ -219,7 +276,7 @@ router.get('/:offerID/applicants', checkAuth, (req, res, next) => {
                 //Obtaining applicant profile  for CollegeName
                 const applicantProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(result.applicant_id) });
                 performa.application_id = result[i]._id;
-                performa.college_name = applicantProfile.college_name;
+                performa.collegeName = applicantProfile.collegeName;
                 performa.is_Seen = result[i].is_Seen;
                 performa.is_Selected = result[i].is_Selected;
                 performa.date=result.apply_date;
@@ -246,6 +303,11 @@ router.get('/:offerID/applicants', checkAuth, (req, res, next) => {
 
 /*
     updateOffer
+    Request:    offer_name=String
+                requirements=String
+                skills=String
+                expectation=String
+    Response:   message=String
 */
 router.patch('/:offerID', checkAuth, (req, res, next) => {
     const off_id = req.params.offerID;
@@ -270,6 +332,8 @@ router.patch('/:offerID', checkAuth, (req, res, next) => {
 
 /*
     toggleVisibility
+    Request:    visibility=Boolean
+    Response:   message=String
 */
 router.post('/:offerID/toggle', checkAuth, (req, res, next) => {
     const off_id = req.params.offerID;
@@ -292,6 +356,7 @@ router.post('/:offerID/toggle', checkAuth, (req, res, next) => {
 
 /*
     deleteOffer
+    Response: message=String
 */
 router.delete('/:offerID', checkAuth, (req, res, next) => {
     const off_id = req.params.offerID;

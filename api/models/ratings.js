@@ -8,13 +8,11 @@ const ratingSchema = mongoose.Schema({
         
     },  
     rating:{
-
-         type: Integer,
+         type: Number,
          required:true
         },
 
     any_suggestions : {
-
            type:String,
            required:true
     } ,   
