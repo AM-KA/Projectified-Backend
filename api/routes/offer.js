@@ -26,7 +26,7 @@ const { resource } = require('../../app');
 */
 router.get('/:domainName', (req, res, next) => {
     const dom_name = req.params.domainName;
-    Offer.find({domain_name: dom_name})
+    Offer.find({domain_name: dom_name, is_visible: true})
     .exec()
     .then(async result => {
         var vals = Array();
@@ -93,6 +93,7 @@ router.get('/:offerID/candidate', (req, res, next) => {
             recruiter_semester:"",
             recruiter_phone:""
         };
+        //console.log(performa);
         if(result){
             //Obtaining recruiter profile for Name, CollegeName, Course and Semester
             const recruiterProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(result.recruiter_id) });
@@ -107,11 +108,14 @@ router.get('/:offerID/candidate', (req, res, next) => {
             performa.recruiter_semester = recruiterProfile.semester;
             performa.recruiter_phone = recruiterUser.phone;
 
+            //console.log(performa);
             //Sending full detailed response
-            res.status(200).json({
+            const obj = {
                 message : "Offer detail fetched successfully.",
                 offer : performa
-            });
+            };
+            console.log(obj);
+            res.status(200).json(obj);
         }
         else{
             res.status(404).json({
@@ -261,26 +265,27 @@ router.get('/:offerID/applicants', checkAuth, (req, res, next) => {
 
     Application.find({offer_id : mongoose.Types.ObjectId(off_id)})
     .then(async result => {
-        var performa = {
-            application_id:"",
-            collegeName:"",
-            is_Seen:"", 
-            is_Selected:"",
-            date:"",
-            applicant_id:""
-        };
         var vals = [];
         if(result){
             for(i=0; i<result.length; i++){
+                var performa = {
+                    application_id:"",
+                    collegeName:"",
+                    is_Seen:"", 
+                    is_Selected:"",
+                    date:"",
+                    applicant_id:""
+                };
                 //Obtaining applicant profile  for CollegeName
-                const applicantProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(result.applicant_id) });
+                const applicantProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(result[i].applicant_id) });
                 performa.application_id = result[i]._id;
                 performa.collegeName = applicantProfile.collegeName;
                 performa.is_Seen = result[i].is_Seen;
                 performa.is_Selected = result[i].is_Selected;
-                performa.date=result.apply_date;
-                performa.applicant_id=result.applicant_id;
+                performa.date=result[i].apply_date;
+                performa.applicant_id=result[i].applicant_id;
                 vals.push(performa)
+                console.log(performa);
             }
             res.status(200).json({
                 message : "Applications detail fetched successfully.",

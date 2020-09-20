@@ -53,6 +53,7 @@ router.patch('/:profileID', checkAuth, (req, res, next) => {
                 name: req.body.name,
                 date: req.body.date, 
                 collegeName: req.body.collegeName,
+                course: req.body.course,
                 semester: req.body.semester,
                 languages: req.body.languages,
                 interest1: req.body.interest1,

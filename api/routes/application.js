@@ -25,10 +25,9 @@ router.post('/', checkAuth, (req, res, next) => {
         resume: req.body.resume,
         previousWork: req.body. previousWork,
         applicant_id:mongoose.Types.ObjectId(req.body.applicant_id),
-        offer_id:mongoose.Types.ObjectId(req.body.offer_id),
-        recruiter_id: mongoose.Types.ObjectId(req.body.recruiter_id)
+        offer_id:mongoose.Types.ObjectId(req.body.offer_id)
     });
-
+    console.log(application);
     application.save()
     .then(result => {
         res.status(200).json({
@@ -203,18 +202,19 @@ router.get('/:applicationID/recruiter', (req, res, next) => {
     Application.findOne({_id :  mongoose.Types.ObjectId(app_id)})
     .exec()
     .then(async result =>{
-        var performa = {
-            is_Seen: result.is_Seen,
-            is_Selected: result.is_Selected,
-            applicant_name: "",
-            applicant_collegeName:"",
-            applicant_course:"",
-            applicant_semester:"",
-            applicant_phone:"",
-            previousWork: result.previousWork,
-            resume: result.resume
-        };
         if(result){
+            var performa = {
+                is_Seen: result.is_Seen,
+                is_Selected: result.is_Selected,
+                applicant_name: "",
+                applicant_collegeName:"",
+                applicant_course:"",
+                applicant_semester:"",
+                applicant_phone:"",
+                previousWork: result.previousWork,
+                resume: result.resume
+            };
+
             //Obtaining recruiter profile for Name, CollegeName, Course and Semester
             const applicantProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(result.applicant_id) });
 
@@ -228,6 +228,7 @@ router.get('/:applicationID/recruiter', (req, res, next) => {
             performa.applicant_semester = applicantProfile.semester;
             performa.applicant_phone = applicantUser.phone;
 
+            console.log(performa);
             //Sending full detailed response
             res.status(200).json({
                 message : "Application detail fetched successfully.",
@@ -259,14 +260,14 @@ router.patch('/:applicationID/seen', checkAuth, (req, res, next) => {
     .then(result =>{
         const seen=result.is_Seen;
 
-        if(seen == "false")
+        if(seen === false)
         { 
             Application
             .updateOne({ 
                 _id : mongoose.Types.ObjectId(app_id)
             },
             {
-                is_Seen: req.body.markedSeen
+                is_Seen: req.body.is_Seen
             })
             .exec()
             .then(result =>{
@@ -302,11 +303,11 @@ router.patch('/:applicationID/selected', checkAuth, (req, res, next) => {
     .then(async result =>{
         const selected=result.is_Selected;
     
-        if(selected == false)
+        if(selected === false)
         { 
             await Application.updateOne({ _id :  mongoose.Types.ObjectId(app_id)},
             {
-                is_Selected: req.body.markedSelected
+                is_Selected: req.body.is_Selected
             })
             .exec()
             .then(result =>{
