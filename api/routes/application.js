@@ -90,7 +90,7 @@ router.delete('/:applicationID', checkAuth, (req, res, next) => {
 /*
     getApplicationsByCandidate(CARD VIEW)
 */
-router.get('/:applicantID', checkAuth, (req, res, next) => {
+router.get('/byApplicant/:applicantID', checkAuth, (req, res, next) => {
     const appt_id = req.params.applicantID                   //  appt =   applicant
     Application.find({applicant_id :  mongoose.Types.ObjectId(appt_id)})
     .then(async result  => {
@@ -129,7 +129,7 @@ router.get('/:applicantID', checkAuth, (req, res, next) => {
 /*
     getApplicationByIdCandidate
 */
-router.get('/:applicationID/candidate', (req, res, next) => {
+router.get('/:applicationID', (req, res, next) => {
     const app_id = req.params.applicationID;
     
     Application.findOne({_id :  mongoose.Types.ObjectId(app_id)})
