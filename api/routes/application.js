@@ -19,6 +19,9 @@ const Offer = require('../models/offer')
 
 router.post('/', checkAuth, (req, res, next) => {
     const date = new Date();
+    const applicant_idC=mongoose.Types.ObjectId(req.body.applicant_id); // Creating offer_idC and applicant_idC for Checking
+    const offer_idC =mongoose.Types.ObjectId(req.body.offer_id);
+
     const application = new Application({
         _id: mongoose.Types.ObjectId() ,
         apply_date: date,
@@ -26,15 +29,29 @@ router.post('/', checkAuth, (req, res, next) => {
         previousWork: req.body. previousWork,
         applicant_id:mongoose.Types.ObjectId(req.body.applicant_id),
         offer_id:mongoose.Types.ObjectId(req.body.offer_id)
+
     });
+
+   Application.find({offer_id :offer_idC} &&  {applcation_id : applicant_idC} )
+   .then(async result => {
+    if(result.length>0){
+        res.status(300).json({
+            message:"Already Applied for the position",
+            code:300
+        })
+    }
+    else{
     console.log(application);
     application.save()
     .then(result => {
         res.status(200).json({
             message: "Applied successfully",
+            code:200,
             application_id : application._id
         });
     })
+}
+   })
     .catch(err => {
         console.log(err);
         return res.status(500).json(err);
