@@ -112,16 +112,17 @@ router.get('/byApplicant/:applicantID', checkAuth, (req, res, next) => {
     Application.find({applicant_id :  mongoose.Types.ObjectId(appt_id)})
     .then(async result  => {
         var vals = [];
-        var performa = {
-            offer_name:"",
-            application_id:"",
-            collegeName:"",
-            float_date: "",
-            is_Seen:"",
-            is_Selected:""
-        }
         for(i=0; i<result.length; i++){
-           //Obtaining offer Details for Offer Name and Offer date
+           var performa = {
+                offer_name:"",
+                application_id:"",
+                collegeName:"",
+                float_date: "",
+                is_Seen:"",
+                is_Selected:""
+            }
+
+            //Obtaining offer Details for Offer Name and Offer date
             const offer =await Offer.findOne({ _id: mongoose.Types.ObjectId(result[i].offer_id) });
 
              //Obtaining recruiter profile for Recruiter's CollegeName,
@@ -167,14 +168,16 @@ router.get('/:applicationID', (req, res, next) => {
             resume: result.resume
         };
         if(result){
+            //Obtaining Offers Details for reqirements and  Skills
+            const offer = await Offer.findOne({ _id: mongoose.Types.ObjectId(result.offer_id) });
+
+            console.log(offer)
+
             //Obtaining recruiter profile for Name, CollegeName, Course and Semester
-            const recruiterProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(result.recruiter_id) });
+            const recruiterProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(offer.recruiter_id) });
 
             //Obtaining Recruiter User detail for Phone Number
-            const recruiterUser = await User.findOne({ _id: mongoose.Types.ObjectId(result.recruiter_id) });
-
-           //Obtaining Offers Details for reqirements and  Skills
-           const offer = await Offer.findOne({ _id: mongoose.Types.ObjectId(result.offer_id) });
+            const recruiterUser = await User.findOne({ _id: mongoose.Types.ObjectId(offer.recruiter_id) });
 
             //Setting Recruiter details
             performa.requirements=offer.requirements;
@@ -289,7 +292,8 @@ router.patch('/:applicationID/seen', checkAuth, (req, res, next) => {
             .exec()
             .then(result =>{
                 res.status(200).json({
-                    message: "Marked as seen successfully."
+                    message: "Marked as seen successfully.",
+                    application_id: app_id
                 });
             })
             .catch(err => {
@@ -329,7 +333,8 @@ router.patch('/:applicationID/selected', checkAuth, (req, res, next) => {
             .exec()
             .then(result =>{
                 res.status(200).json({
-                    message: "Marked as selected successfully."
+                    message: "Marked as selected successfully.",
+                    application_id: app_id
                 });
             })
             .catch(err => {
