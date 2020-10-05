@@ -30,13 +30,18 @@ router.post('/', checkAuth, (req, res, next) => {
     .save()
     .then(result => {
         res.status(200).json({
+            code: 200,
             message: "Profile Created Succesfully",
             profile_id : result._id
         });
     })
     .catch(err => {
         console.log(err);
-        return res.status(500).json(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
+        });
     });
 });
 
@@ -67,12 +72,17 @@ router.patch('/:profileID', checkAuth, (req, res, next) => {
     .exec()
     .then(result => {
         res.status(200).json({
-           message: "Profile updated successfully." 
+            code: 200,
+            message: "Profile updated successfully." 
         });
     })
     .catch(err => {
         console.log(err);
-        return res.status(500).json(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
+        });
     });
 });
 
@@ -86,17 +96,26 @@ router.get('/:profileID', (req, res, next) => {
     .exec()
     .then(result => {
         if(result){
-            res.status(200).json(result);
+            res.status(200).json({
+                code: 200,
+                message: "Profile fetched successfully.",
+                ...result
+            });
         }
         else{
             res.status(404).json({
+                code: 404,
                 message: "Not found!"
             });
         }
     })
     .catch(err => {
         console.log(err);
-        return res.status(500).json(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
+        });
     });
 });
 

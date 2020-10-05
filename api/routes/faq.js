@@ -14,13 +14,17 @@ router.get('/', (request, response, next) => {
     .find({answered: true})
     .then(result => {
         response.status(200).json({
+            code: 200,
+            message: "FAQ Items fetched successfully.",
             faqList: result
         });
     })
     .catch(err => {
         console.log(err);
-        response.status(500).json({
-            error:err
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
         });
     });
 });
@@ -39,13 +43,17 @@ router.post('/', (request, response, next) => {
     .save()
     .then(result => {
         response.status(200).json({
-            code: "200",
+            code: 200,
             message: "Item added successfully."
         });
     })
     .catch(err => {
         console.log(err);
-        return res.status(500).json(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
+        });
     });
     
 });
@@ -69,12 +77,17 @@ router.patch('/:faqID', (request, response, next) => {
         .exec()
         .then(result => {
             response.status(200).json({
+                code: 200,
                 message:"Item updated successfully."
             });
         })
         .catch(err => {
             console.log(err);
-            return res.status(500).json(err);
+            return res.status(500).json({
+                code: 500,
+                message: "Some error occured.",
+                error: err
+            });
         });
 });
 
@@ -89,12 +102,17 @@ router.delete('/:faqID', (request, response, next) => {
         .exec()
         .then(result => {
             response.status(200).json({
+                code: 200,
                 message:"Item deleted successfully."
             });
         })
         .catch(err => {
             console.log(err);
-            return res.status(500).json(err);
+            return res.status(500).json({
+                code: 500,
+                message: "Some error occured.",
+                error: err
+            });
         });
 });
 
@@ -108,8 +126,10 @@ router.get('/all', (request, response, next) => {
     })
     .catch(err => {
         console.log(err);
-        response.status(500).json({
-            error:err
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
         });
     });
 });

@@ -49,13 +49,18 @@ router.get('/:domainName', (req, res, next) => {
         }
         console.log(vals);
         res.status(200).json({
+            code: 200,
             message : "Offers fetched successfully.",
             offers: vals
         });
     })
     .catch(err => {
         console.log(err);
-        return res.status(500).json(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
+        });
     });
 
 });
@@ -111,6 +116,7 @@ router.get('/:offerID/candidate', (req, res, next) => {
             //console.log(performa);
             //Sending full detailed response
             const obj = {
+                code: 200,
                 message : "Offer detail fetched successfully.",
                 offer : performa
             };
@@ -119,13 +125,18 @@ router.get('/:offerID/candidate', (req, res, next) => {
         }
         else{
             res.status(404).json({
+                code: 404,
                 message : "Not found."
             });
         }
     })
     .catch(err => {
         console.log(err);
-        return res.status(500).json(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
+        });
     });
 });
 
@@ -160,13 +171,18 @@ router.post('/', checkAuth, (req, res, next) => {
     offer.save()
     .then(result => {
         res.status(200).json({
+            code: 200,
             message: "Offer added successfully",
             job_id : offer._id
         });
     })
     .catch(err => {
         console.log(err);
-        return res.status(500).json(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
+        });
     });
 });
 
@@ -202,8 +218,17 @@ router.get('/recruiter/:recruiterID', checkAuth, (req, res, next) => {
             vals.push(performa);
         }
         res.status(200).json({
+            code: 200,
             message: "Offers fetched successfully.",
             offers : vals
+        });
+    })
+    .catch(err=>{
+        console.log(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
         });
     });
 });
@@ -240,8 +265,17 @@ router.get('/:offerID/recruiter', checkAuth, (req, res, next) => {
             performa.expectation = result.expectation;
             performa.is_visible = result.is_visible;
         res.status(200).json({
+            code: 200,
             message: "Offer fetched successfully.",
             offer : performa
+        });
+    })
+    .catch(err=>{
+        console.log(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
         });
     });
 });
@@ -288,19 +322,25 @@ router.get('/:offerID/applicants', checkAuth, (req, res, next) => {
                 console.log(performa);
             }
             res.status(200).json({
+                code: 200,
                 message : "Applications detail fetched successfully.",
                 applicants : vals
             });
         }
         else{
             res.status(404).json({
+                code: 404,
                 message : "Not found."
             });
         }
     })
     .catch(err => {
         console.log(err);
-        return res.status(500).json(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
+        });
     });
 });
 
@@ -325,12 +365,17 @@ router.patch('/:offerID', checkAuth, (req, res, next) => {
     })
     .then(result => {
         res.status(200).json({
+            code: 200,
             message : "Offer details updated successfully."
         })
     })
     .catch(err => {
         console.log(err);
-        return res.status(500).json(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
+        });
     });
 });
 
@@ -349,12 +394,17 @@ router.post('/:offerID/toggle', checkAuth, (req, res, next) => {
     .exec()
     .then(result =>{
         res.status(200).json({
+            code: 200,
             message: "Offer visibility changed successfully."
         });
     })
     .catch(err => {
         console.log(err);
-        return res.status(500).json(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
+        });
     });
 });
 
@@ -371,12 +421,17 @@ router.delete('/:offerID', checkAuth, (req, res, next) => {
     .exec()
     .then(result =>{
         res.status(200).json({
+            code: 200,
             message : "Offer deleted successfully."
         });
     })
     .catch(err => {
         console.log(err);
-        return res.status(500).json(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
+        });
     });
 });
 

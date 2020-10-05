@@ -43,15 +43,24 @@ router.post('/signup', (req, res, next) =>{
                         })
                         .catch(err => {
                             console.log(err);
-                            res.status(500).json({
-                                error:err
+                            return res.status(500).json({
+                                code: 500,
+                                message: "Some error occured.",
+                                error: err
                             });         
                         });
                 }
             });
         }
     })
-    .catch();
+    .catch(err => {
+        console.log(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
+        });
+    });
 });
 
 
@@ -74,7 +83,7 @@ router.post('/login', (req, res, next) => {
             if(err){
                 return res.status(200).json({
                     code:401,
-                    message : "Auth failed"
+                    message : "Authorization failed"
                 });
             }
             if(result){
@@ -115,15 +124,17 @@ router.post('/login', (req, res, next) => {
             else{
                 return res.status(200).json({
                     code:401,
-                    message : "Auth failed"
+                    message : "Authorization failed"
                 });
             }
         });
     })
     .catch(err => {
         console.log(err);
-        res.status(500).json({
-            error:err
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
         });
     });
 });
@@ -141,12 +152,18 @@ router.get('/', (req, res, next) => {
     User
     .find()
     .then(result => {
-        res.status(200).json(result);
+        res.status(200).json({
+            ...result,
+            code: 200,
+            message: "Fetch success."
+        });
     })
     .catch(err => {
         console.log(err);
-        res.status(500).json({
-            error:err
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
         });
     });
 });

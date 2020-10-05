@@ -54,7 +54,11 @@ router.post('/', checkAuth, (req, res, next) => {
    })
     .catch(err => {
         console.log(err);
-        return res.status(500).json(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
+        });
     });
 });
 
@@ -73,12 +77,17 @@ router.patch('/:applicationID', checkAuth, (req, res, next) => {
     }})
     .then(result =>{
         res.status(200).json({
+            code: 200,
             message : "Application updated successfully."
         })
     })
     .catch(err => {
         console.log(err);
-        return res.status(500).json(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
+        });
     });
 });
 
@@ -94,12 +103,17 @@ router.delete('/:applicationID', checkAuth, (req, res, next) => {
     .exec()
     .then(result =>{
         res.status(200).json({
+            code: 200,
             message : "Application deleted successfully."
         });
     })
     .catch(err => {
         console.log(err);
-        return res.status(500).json(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
+        });
     });
 });
 
@@ -137,8 +151,17 @@ router.get('/byApplicant/:applicantID', checkAuth, (req, res, next) => {
             vals.push(performa);
         }
         res.status(200).json({
+            code: 200,
             message: " All Applications fetched successfully.",
             applications : vals
+        });
+    })
+    .catch(err=>{
+        console.log(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
         });
     });
 });
@@ -191,19 +214,25 @@ router.get('/:applicationID', (req, res, next) => {
 
             //Sending full detailed response
             res.status(200).json({
+                code: 200,
                 message : "Application detail fetched successfully.",
                 application : performa
             });
         }
         else{
             res.status(404).json({
+                code: 404,
                 message : "Not found."
             });
         }
     })
     .catch(err => {
         console.log(err);
-        return res.status(500).json(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
+        });
     });
 });
 
@@ -251,19 +280,25 @@ router.get('/:applicationID/recruiter', (req, res, next) => {
             console.log(performa);
             //Sending full detailed response
             res.status(200).json({
+                code: 200,
                 message : "Application detail fetched successfully.",
                 application : performa
             });
         }
         else{
             res.status(404).json({
+                code: 404,
                 message : "Not found."
             });
         }
     })
     .catch(err => {
         console.log(err);
-        return res.status(500).json(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
+        });
     });
 });
 
@@ -292,23 +327,33 @@ router.patch('/:applicationID/seen', checkAuth, (req, res, next) => {
             .exec()
             .then(result =>{
                 res.status(200).json({
+                    code: 200,
                     message: "Marked as seen successfully.",
                     application_id: app_id
                 });
             })
             .catch(err => {
                 console.log(err);
-                return res.status(500).json(err);
+                return res.status(500).json({
+                    code: 500,
+                    message: "Some error occured.",
+                    error: err
+                });
             });
         } else{
             res.status(200).json({
+                code: 403,
                 message: "Application already seen."
             });
         }
     })
     .catch(err => {
         console.log(err);
-        return res.status(500).json(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
+        });
     });
 });
 
@@ -333,23 +378,33 @@ router.patch('/:applicationID/selected', checkAuth, (req, res, next) => {
             .exec()
             .then(result =>{
                 res.status(200).json({
+                    code: 200,
                     message: "Marked as selected successfully.",
                     application_id: app_id
                 });
             })
             .catch(err => {
                 console.log(err);
-                return res.status(500).json(err);
+                return res.status(500).json({
+                    code: 500,
+                    message: "Some error occured.",
+                    error: err
+                });
             });        
         }else{
             res.status(200).json({
+                code: 403,
                 message: "Candidate already selected."
             });
         }
     })
     .catch(err => {
         console.log(err);
-        return res.status(500).json(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
+        });
     });
 
 });
