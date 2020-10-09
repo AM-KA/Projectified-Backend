@@ -65,6 +65,51 @@ router.post('/signup', (req, res, next) =>{
 
 
 /*
+     
+      check signUp 
+
+  */
+ router.post('/checksignup', (req, res, next) =>{
+     const emailC=req.body.email
+     const phoneC = req.body.phone
+
+    User
+    .find({email:emailC})
+    .exec()
+    .then(user => {
+        if(user.length >= 1){
+            return res.status(300).json({
+                code:300,
+                message: "User Already Registered"
+            });
+        }
+            else if(user.length==0)
+            {
+                User
+                .find({phone:phoneC})
+                .exec()
+                .then(user => {
+                    if(user.length >= 1){
+                        return res.status(300).json({
+                            code:300,
+                            message: "User Already Registered"
+                        });
+                    }
+                })
+                        .catch(err => {
+                            console.log(err);
+                            return res.status(500).json(err);
+                        });
+        }
+    })
+    .catch(err => {
+        console.log(err);
+        return res.status(500).json(err);
+    });
+});
+        
+
+/*
     logIn
 */
 router.post('/login', (req, res, next) => {
