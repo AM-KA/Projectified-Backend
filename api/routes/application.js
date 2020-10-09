@@ -129,6 +129,7 @@ router.get('/byApplicant/:applicantID', checkAuth, (req, res, next) => {
         for(i=0; i<result.length; i++){
            var performa = {
                 offer_name:"",
+                recruiter_name:"",
                 application_id:"",
                 collegeName:"",
                 float_date: "",
@@ -143,6 +144,7 @@ router.get('/byApplicant/:applicantID', checkAuth, (req, res, next) => {
             const recruiterProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(offer.recruiter_id) });
 
             performa.offer_name = offer.offer_name;
+            performa.recruiter_name = recruiterProfile.name;
             performa.float_date = offer.float_date;
             performa.application_id = result[i]._id;
             performa.collegeName = recruiterProfile.collegeName;
