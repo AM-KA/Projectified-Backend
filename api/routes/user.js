@@ -88,19 +88,27 @@ router.post('/signup', (req, res, next) =>{
                 User
                 .find({phone:phoneC})
                 .exec()
-                .then(user => {
-                    if(user.length >= 1){
+                .then(user2 => {
+                    if(user2.length >= 1){
                         return res.status(300).json({
                             code:300,
                             message: "User Already Registered"
                         });
                     }
+                    else
+                       return res.status(200).json({
+                           code:200,
+                           message:"Credentials are Ok"
+                       }) 
+
                 })
                         .catch(err => {
                             console.log(err);
                             return res.status(500).json(err);
                         });
         }
+
+         
     })
     .catch(err => {
         console.log(err);
