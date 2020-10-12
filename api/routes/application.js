@@ -32,7 +32,7 @@ router.post('/', checkAuth, (req, res, next) => {
 
     });
 
-   Application.find({offer_id :offer_idC} &&  {applcation_id : applicant_idC} )
+   Application.find({offer_id :offer_idC , applicant_id:applicant_idC} )
    .then(async result => {
     if(result.length>0){
         res.status(300).json({
@@ -46,19 +46,14 @@ router.post('/', checkAuth, (req, res, next) => {
     .then(result => {
         res.status(200).json({
             message: "Applied successfully",
-            code:200,
-            application_id : application._id
+            code:200
         });
     })
 }
    })
     .catch(err => {
         console.log(err);
-        return res.status(500).json({
-            code: 500,
-            message: "Some error occured.",
-            error: err
-        });
+        return res.status(500).json(err);
     });
 });
 
@@ -77,17 +72,12 @@ router.patch('/:applicationID', checkAuth, (req, res, next) => {
     }})
     .then(result =>{
         res.status(200).json({
-            code: 200,
             message : "Application updated successfully."
         })
     })
     .catch(err => {
         console.log(err);
-        return res.status(500).json({
-            code: 500,
-            message: "Some error occured.",
-            error: err
-        });
+        return res.status(500).json(err);
     });
 });
 
@@ -103,17 +93,12 @@ router.delete('/:applicationID', checkAuth, (req, res, next) => {
     .exec()
     .then(result =>{
         res.status(200).json({
-            code: 200,
             message : "Application deleted successfully."
         });
     })
     .catch(err => {
         console.log(err);
-        return res.status(500).json({
-            code: 500,
-            message: "Some error occured.",
-            error: err
-        });
+        return res.status(500).json(err);
     });
 });
 
@@ -126,25 +111,22 @@ router.get('/byApplicant/:applicantID', checkAuth, (req, res, next) => {
     Application.find({applicant_id :  mongoose.Types.ObjectId(appt_id)})
     .then(async result  => {
         var vals = [];
+        var performa = {
+            offer_name:"",
+            application_id:"",
+            collegeName:"",
+            float_date: "",
+            is_Seen:"",
+            is_Selected:""
+        }
         for(i=0; i<result.length; i++){
-           var performa = {
-                offer_name:"",
-                recruiter_name:"",
-                application_id:"",
-                collegeName:"",
-                float_date: "",
-                is_Seen:"",
-                is_Selected:""
-            }
-
-            //Obtaining offer Details for Offer Name and Offer date
+           //Obtaining offer Details for Offer Name and Offer date
             const offer =await Offer.findOne({ _id: mongoose.Types.ObjectId(result[i].offer_id) });
 
              //Obtaining recruiter profile for Recruiter's CollegeName,
             const recruiterProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(offer.recruiter_id) });
 
             performa.offer_name = offer.offer_name;
-            performa.recruiter_name = recruiterProfile.name;
             performa.float_date = offer.float_date;
             performa.application_id = result[i]._id;
             performa.collegeName = recruiterProfile.collegeName;
@@ -153,20 +135,11 @@ router.get('/byApplicant/:applicantID', checkAuth, (req, res, next) => {
             vals.push(performa);
         }
         res.status(200).json({
-            code: 200,
             message: " All Applications fetched successfully.",
-            applications : vals
-        });
-    })
-    .catch(err=>{
-        console.log(err);
-        return res.status(500).json({
-            code: 500,
-            message: "Some error occured.",
-            error: err
+            Applications : vals
         });
     });
-});
+}); 
 
 
 /*
@@ -193,16 +166,14 @@ router.get('/:applicationID', (req, res, next) => {
             resume: result.resume
         };
         if(result){
-            //Obtaining Offers Details for reqirements and  Skills
-            const offer = await Offer.findOne({ _id: mongoose.Types.ObjectId(result.offer_id) });
-
-            console.log(offer)
-
             //Obtaining recruiter profile for Name, CollegeName, Course and Semester
-            const recruiterProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(offer.recruiter_id) });
+            const recruiterProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(result.recruiter_id) });
 
             //Obtaining Recruiter User detail for Phone Number
-            const recruiterUser = await User.findOne({ _id: mongoose.Types.ObjectId(offer.recruiter_id) });
+            const recruiterUser = await User.findOne({ _id: mongoose.Types.ObjectId(result.recruiter_id) });
+
+           //Obtaining Offers Details for reqirements and  Skills
+           const offer = await Offer.findOne({ _id: mongoose.Types.ObjectId(result.offer_id) });
 
             //Setting Recruiter details
             performa.requirements=offer.requirements;
@@ -216,25 +187,19 @@ router.get('/:applicationID', (req, res, next) => {
 
             //Sending full detailed response
             res.status(200).json({
-                code: 200,
                 message : "Application detail fetched successfully.",
                 application : performa
             });
         }
         else{
             res.status(404).json({
-                code: 404,
                 message : "Not found."
             });
         }
     })
     .catch(err => {
         console.log(err);
-        return res.status(500).json({
-            code: 500,
-            message: "Some error occured.",
-            error: err
-        });
+        return res.status(500).json(err);
     });
 });
 
@@ -282,25 +247,19 @@ router.get('/:applicationID/recruiter', (req, res, next) => {
             console.log(performa);
             //Sending full detailed response
             res.status(200).json({
-                code: 200,
                 message : "Application detail fetched successfully.",
                 application : performa
             });
         }
         else{
             res.status(404).json({
-                code: 404,
                 message : "Not found."
             });
         }
     })
     .catch(err => {
         console.log(err);
-        return res.status(500).json({
-            code: 500,
-            message: "Some error occured.",
-            error: err
-        });
+        return res.status(500).json(err);
     });
 });
 
@@ -329,33 +288,22 @@ router.patch('/:applicationID/seen', checkAuth, (req, res, next) => {
             .exec()
             .then(result =>{
                 res.status(200).json({
-                    code: 200,
-                    message: "Marked as seen successfully.",
-                    application_id: app_id
+                    message: "Marked as seen successfully."
                 });
             })
             .catch(err => {
                 console.log(err);
-                return res.status(500).json({
-                    code: 500,
-                    message: "Some error occured.",
-                    error: err
-                });
+                return res.status(500).json(err);
             });
         } else{
             res.status(200).json({
-                code: 403,
                 message: "Application already seen."
             });
         }
     })
     .catch(err => {
         console.log(err);
-        return res.status(500).json({
-            code: 500,
-            message: "Some error occured.",
-            error: err
-        });
+        return res.status(500).json(err);
     });
 });
 
@@ -380,33 +328,22 @@ router.patch('/:applicationID/selected', checkAuth, (req, res, next) => {
             .exec()
             .then(result =>{
                 res.status(200).json({
-                    code: 200,
-                    message: "Marked as selected successfully.",
-                    application_id: app_id
+                    message: "Marked as selected successfully."
                 });
             })
             .catch(err => {
                 console.log(err);
-                return res.status(500).json({
-                    code: 500,
-                    message: "Some error occured.",
-                    error: err
-                });
+                return res.status(500).json(err);
             });        
         }else{
             res.status(200).json({
-                code: 403,
                 message: "Candidate already selected."
             });
         }
     })
     .catch(err => {
         console.log(err);
-        return res.status(500).json({
-            code: 500,
-            message: "Some error occured.",
-            error: err
-        });
+        return res.status(500).json(err);
     });
 
 });
