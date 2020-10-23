@@ -134,4 +134,26 @@ router.get('/all', (request, response, next) => {
     });
 });
 
+/*
+    getUnanswered
+*/
+router.get('/unanswered', (request, response, next) => {
+    FAQ
+    .find({answered: false})
+    .then(result => {
+        response.status(200).json({
+            code: 200,
+            message: "FAQ Items fetched successfully.",
+            faqList: result
+        });
+    })
+    .catch(err => {
+        console.log(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
+        });
+    });
+});
 module.exports = router;
