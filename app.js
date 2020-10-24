@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 const userRoutes = require('./api/routes/user');
+const adminRoutes = require('./api/routes/admin');
 const offerRoutes = require('./api/routes/offer');
 const userProfileRoutes=require('./api/routes/profile');
 const applicationRoutes=require('./api/routes/application')
@@ -45,6 +46,7 @@ app.use((req, res, next)=>{
 app.use('/application', applicationRoutes);
 app.use('/profile', userProfileRoutes)
 app.use('/user', userRoutes);
+app.use('/admin', adminRoutes);
 app.use ('/offer', offerRoutes);
 app.use('/faq', faqRoutes);
 app.use('/rating', ratingRoutes);

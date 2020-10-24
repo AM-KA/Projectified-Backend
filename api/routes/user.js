@@ -264,17 +264,43 @@ router.get('/:userId', (req, res, next) => {
     deleteUserById : This route is solely for checking purposes. Don't expose it.
 */
 router.delete("/:userId", checkAuth, (req, res, next) => {
-    User.remove({_id: req.params.userId})
-    .exec()
-    .then(result => {
-        res.status(200).json({
-            message : "Delete success!"
+    const uid = req.params.userId
+    Application.deleteMany({applicant_id: uid})
+    .then(xyz => {
+        Offer
+        .deleteMany({recruiter_id : uid})
+        .exec()
+        .then(result =>{
+            User.remove({_id: req.params.userId})
+            .exec()
+            .then(result => {
+                res.status(200).json({
+                    code:200,
+                    message : "Delete success!"
+                });
+            })
+            .catch(err => {
+                console.log(err);
+                res.status(500).json({
+                    error:err
+                });
+            });
+        })
+        .catch(err => {
+            console.log(err);
+            return res.status(500).json({
+                code: 500,
+                message: "Some error occured.",
+                error: err
+            });
         });
     })
     .catch(err => {
         console.log(err);
-        res.status(500).json({
-            error:err
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
         });
     });
 });

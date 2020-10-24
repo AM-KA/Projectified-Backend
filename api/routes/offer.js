@@ -415,14 +415,24 @@ router.post('/:offerID/toggle', checkAuth, (req, res, next) => {
 */
 router.delete('/:offerID', checkAuth, (req, res, next) => {
     const off_id = req.params.offerID;
-    
-    Offer
-    .deleteOne({_id : off_id})
-    .exec()
-    .then(result =>{
-        res.status(200).json({
-            code: 200,
-            message : "Offer deleted successfully."
+    Application.deleteMany({offer_id: off_id})
+    .then(xyz => {
+        Offer
+        .deleteOne({_id : off_id})
+        .exec()
+        .then(result =>{
+            res.status(200).json({
+                code: 200,
+                message : "Offer deleted successfully."
+            });
+        })
+        .catch(err => {
+            console.log(err);
+            return res.status(500).json({
+                code: 500,
+                message: "Some error occured.",
+                error: err
+            });
         });
     })
     .catch(err => {
@@ -442,11 +452,42 @@ router.delete('/:offerID', checkAuth, (req, res, next) => {
 /*
     getAllOffers : This route is solely for checking purposes. Do not expose it.
 */
-router.get('/', (req, res, next) => {
+router.get('/', checkAuth, (req, res, next) => {
     Offer.find()
     .exec()
-    .then(result => {
-        res.status(200).json(result);
+    .then(async result => {
+        var vals = Array();
+        for(i=0; i<result.length; i++){
+            const offer = result[i];
+            const recruiterProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(offer.recruiter_id) });
+            const performa = {
+                offer_id: "",
+                offer_name: "",
+                skills: "",
+                float_date:"",
+                collegeName:""
+            };
+            performa.offer_id = offer._id;
+            performa.offer_name = offer.offer_name;
+            performa.skills = offer.skills;
+            performa.float_date = offer.float_date;
+            performa.collegeName = recruiterProfile.collegeName;
+            vals.push(performa);
+        }
+        console.log(vals);
+        res.status(200).json({
+            code: 200,
+            message : "Offers fetched successfully.",
+            offers: vals
+        });
+    })
+    .catch(err => {
+        console.log(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
+        });
     });
 });
 
