@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const Profile = require('../models/profile');
+const User = require('../models/user');
 const checkAuth = require('../middleware/check-auth');
 
 /*
@@ -10,7 +10,7 @@ const checkAuth = require('../middleware/check-auth');
 */
 router.post('/', checkAuth, (req, res, next) => {
     const date = new Date();
-    const profile =  new Profile({
+    const user =  new User({
         _id: mongoose.Types.ObjectId(req.body.userID) ,
         name: req.body.name,
         date: date,
@@ -25,14 +25,14 @@ router.post('/', checkAuth, (req, res, next) => {
         description: req.body.description,
        
     });
-    console.log(profile);
-    profile
+    console.log(User);
+    user
     .save()
     .then(result => {
         res.status(200).json({
             code: 200,
             message: "Profile Created Succesfully",
-            profile_id : result._id
+            user_id : result._id
         });
     })
     .catch(err => {

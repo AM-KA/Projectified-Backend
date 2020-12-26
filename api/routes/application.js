@@ -5,7 +5,6 @@ const jwt = require('jsonwebtoken');
 
 const Application = require('../models/application');
 const checkAuth = require('../middleware/check-auth');
-const Profile = require('../models/profile');
 const User = require('../models/user');
 const Offer = require('../models/offer')
 
@@ -35,9 +34,9 @@ router.post('/', checkAuth, (req, res, next) => {
    Application.find({offer_id :offer_idC , applicant_id:applicant_idC} )
    .then(async result => {
     if(result.length>0){
-        res.status(300).json({
-            message:"Already Applied for the position",
-            code:300
+        res.status(201).json({
+            message:"You have already applied for this opportunity. Check the status of your application in the 'My Applications' tab.",
+            code:201
         })
     }
     else{
@@ -45,7 +44,7 @@ router.post('/', checkAuth, (req, res, next) => {
     application.save()
     .then(result => {
         res.status(200).json({
-            message: "Applied successfully",
+            message: "You have applied successfully for this opportunity.",
             code:200
         });
     })
@@ -72,7 +71,8 @@ router.patch('/:applicationID', checkAuth, (req, res, next) => {
     }})
     .then(result =>{
         res.status(200).json({
-            message : "Application updated successfully."
+            code:200,
+            message : "Your application was updated successfully."
         })
     })
     .catch(err => {
@@ -89,11 +89,12 @@ router.delete('/:applicationID', checkAuth, (req, res, next) => {
     const app_id = req.params.applicationID;
     
     Application
-    .remove({_id :  mongoose.Types.ObjectId(app_id)})
+    .deleteOne({_id :  mongoose.Types.ObjectId(app_id)})
     .exec()
     .then(result =>{
         res.status(200).json({
-            message : "Application deleted successfully."
+            code:200,
+            message : "Your application was deleted successfully."
         });
     })
     .catch(err => {
@@ -111,32 +112,37 @@ router.get('/byApplicant/:applicantID', checkAuth, (req, res, next) => {
     Application.find({applicant_id :  mongoose.Types.ObjectId(appt_id)})
     .then(async result  => {
         var vals = [];
-        var performa = {
-            offer_name:"",
-            application_id:"",
-            collegeName:"",
-            float_date: "",
-            is_Seen:"",
-            is_Selected:""
-        }
+    
         for(i=0; i<result.length; i++){
            //Obtaining offer Details for Offer Name and Offer date
             const offer =await Offer.findOne({ _id: mongoose.Types.ObjectId(result[i].offer_id) });
 
-             //Obtaining recruiter profile for Recruiter's CollegeName,
-            const recruiterProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(offer.recruiter_id) });
+             //Obtaining recruiter user document for Recruiter's CollegeName,
+            const recruiter = await User.findOne({ _id: mongoose.Types.ObjectId(offer.recruiter_id) });
+            
+            var performa = {
+                offer_name:"",
+                recruiter_name:"",
+                application_id:"",
+                collegeName:"",
+                float_date: "",
+                is_Seen:"",
+                is_Selected:""
+            }
 
             performa.offer_name = offer.offer_name;
+            performa.recruiter_name = recruiter.name;
             performa.float_date = offer.float_date;
             performa.application_id = result[i]._id;
-            performa.collegeName = recruiterProfile.collegeName;
+            performa.collegeName = recruiter.collegeName;
             performa.is_Seen = result[i].is_Seen;
             performa.is_Selected = result[i].is_Selected;
             vals.push(performa);
         }
         res.status(200).json({
+            code: 200,
             message: " All Applications fetched successfully.",
-            Applications : vals
+            applications : vals
         });
     });
 }); 
@@ -166,34 +172,34 @@ router.get('/:applicationID', (req, res, next) => {
             resume: result.resume
         };
         if(result){
-            //Obtaining recruiter profile for Name, CollegeName, Course and Semester
-            const recruiterProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(result.recruiter_id) });
+            //Obtaining Offers Details for reqirements and  Skills
+            const offer = await Offer.findOne({ _id: mongoose.Types.ObjectId(result.offer_id) });
 
-            //Obtaining Recruiter User detail for Phone Number
-            const recruiterUser = await User.findOne({ _id: mongoose.Types.ObjectId(result.recruiter_id) });
-
-           //Obtaining Offers Details for reqirements and  Skills
-           const offer = await Offer.findOne({ _id: mongoose.Types.ObjectId(result.offer_id) });
+            //Obtaining recruiter user document for Name, CollegeName, Course and Semester
+            const recruiter = await User.findOne({ _id: mongoose.Types.ObjectId(offer.recruiter_id) });
 
             //Setting Recruiter details
             performa.requirements=offer.requirements;
             performa.skills=offer.skills;
             performa.expectation=offer.expectation;
-            performa.recruiter_name = recruiterProfile.name;
-            performa.recruiter_collegeName = recruiterProfile.collegeName;
-            performa.recruiter_course = recruiterProfile.course;
-            performa.recruiter_semester = recruiterProfile.semester;
-            performa.recruiter_phone = recruiterUser.phone;
+            performa.recruiter_name = recruiter.name;
+            //performa.recruiter_name = "AK";
+            performa.recruiter_collegeName = recruiter.collegeName;
+            performa.recruiter_course = recruiter.course;
+            performa.recruiter_semester = recruiter.semester;
+            performa.recruiter_phone = recruiter.phone;
 
             //Sending full detailed response
             res.status(200).json({
-                message : "Application detail fetched successfully.",
+                code:200,
+                message : "Application details were fetched successfully.",
                 application : performa
             });
         }
         else{
             res.status(404).json({
-                message : "Not found."
+                code:200,
+                message : "The requested data was not found."
             });
         }
     })
@@ -231,29 +237,28 @@ router.get('/:applicationID/recruiter', (req, res, next) => {
                 resume: result.resume
             };
 
-            //Obtaining recruiter profile for Name, CollegeName, Course and Semester
-            const applicantProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(result.applicant_id) });
+            //Obtaining applicant user document for Name, CollegeName, Course and Semester
+            const applicant = await User.findOne({ _id: mongoose.Types.ObjectId(result.applicant_id) });
 
-            //Obtaining Recruiter User detail for Phone Number
-            const applicantUser = await User.findOne({ _id: mongoose.Types.ObjectId(result.applicant_id) });
-
-            //Setting Recruiter details
-            performa.applicant_name = applicantProfile.name;
-            performa.applicant_collegeName = applicantProfile.collegeName;
-            performa.applicant_course = applicantProfile.course;
-            performa.applicant_semester = applicantProfile.semester;
-            performa.applicant_phone = applicantUser.phone;
+            //Setting Applicant details
+            performa.applicant_name = applicant.name;
+            performa.applicant_collegeName = applicant.collegeName;
+            performa.applicant_course = applicant.course;
+            performa.applicant_semester = applicant.semester;
+            performa.applicant_phone = applicant.phone;
 
             console.log(performa);
             //Sending full detailed response
             res.status(200).json({
-                message : "Application detail fetched successfully.",
+                code:200,
+                message : "Application details were fetched successfully.",
                 application : performa
             });
         }
         else{
             res.status(404).json({
-                message : "Not found."
+                code:200,
+                message : "The requested data was not found."
             });
         }
     })
@@ -288,7 +293,8 @@ router.patch('/:applicationID/seen', checkAuth, (req, res, next) => {
             .exec()
             .then(result =>{
                 res.status(200).json({
-                    message: "Marked as seen successfully."
+                    code:200,
+                    message: "The application was marked as seen successfully."
                 });
             })
             .catch(err => {
@@ -297,7 +303,8 @@ router.patch('/:applicationID/seen', checkAuth, (req, res, next) => {
             });
         } else{
             res.status(200).json({
-                message: "Application already seen."
+                code:200,
+                message: "The application has already been marked as seen."
             });
         }
     })
@@ -328,7 +335,8 @@ router.patch('/:applicationID/selected', checkAuth, (req, res, next) => {
             .exec()
             .then(result =>{
                 res.status(200).json({
-                    message: "Marked as selected successfully."
+                    code:200,
+                    message: "The application was marked as selected successfully."
                 });
             })
             .catch(err => {
@@ -337,7 +345,8 @@ router.patch('/:applicationID/selected', checkAuth, (req, res, next) => {
             });        
         }else{
             res.status(200).json({
-                message: "Candidate already selected."
+                code:200,
+                message: "The candidate has already been selected."
             });
         }
     })
@@ -379,11 +388,8 @@ router.get('/', (req, res, next) => {
             var vals = [];
             for(i=0; i<result.length; i++){
 
-                //Obtaining recruiter profile for Name, CollegeName, Course and Semester
-                const recruiterProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(result.recruiter_id) });
-
-                //Obtaining Recruiter User detail for Phone Number
-                const recruiterUser = await User.findOne({ _id: mongoose.Types.ObjectId(result.recruiter_id) });
+                //Obtaining recruiter user document for Name, CollegeName, Course and Semester
+                const recruiter = await User.findOne({ _id: mongoose.Types.ObjectId(result.recruiter_id) });
 
                 //Obtaining Offers Details for reqirements and  Skills
                 const offer = await Offer.findOne({ _id: mongoose.Types.ObjectId(result.offer_id) });
@@ -392,23 +398,25 @@ router.get('/', (req, res, next) => {
                 performa.requirements=offer.requirements;
                 performa.skills=offer.skills;
                 performa.expectation=offer.expectation;
-                performa.recruiter_name = recruiterProfile.name;
-                performa.recruiter_collegeName = recruiterProfile.collegeName;
-                performa.recruiter_course = recruiterProfile.course;
-                performa.recruiter_semester = recruiterProfile.semester;
-                performa.recruiter_phone = recruiterUser.phone;
+                performa.recruiter_name = recruiter.name;
+                performa.recruiter_collegeName = recruiter.collegeName;
+                performa.recruiter_course = recruiter.course;
+                performa.recruiter_semester = recruiter.semester;
+                performa.recruiter_phone = recruiter.phone;
 
                 vals.push(performa);
             }
             //Sending full detailed response
             res.status(200).json({
-                message : "All Applications fetched successfully.",
+                message : "All applications were fetched successfully.",
+                code:200,
                 applications : vals
             });
         }
         else{
             res.status(404).json({
-                message : "Not found."
+                code:200,
+                message : "The requested data was not found."
             });
         }
     })

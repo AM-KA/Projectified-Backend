@@ -5,7 +5,6 @@ const jwt = require('jsonwebtoken');
 
 const Offer = require('../models/offer');
 const checkAuth = require('../middleware/check-auth');
-const Profile = require('../models/profile');
 const User = require('../models/user');
 const Application = require('../models/application');
 const { resource } = require('../../app');
@@ -32,7 +31,7 @@ router.get('/:domainName', (req, res, next) => {
         var vals = Array();
         for(i=0; i<result.length; i++){
             const offer = result[i];
-            const recruiterProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(offer.recruiter_id) });
+            const recruiter = await User.findOne({ _id: mongoose.Types.ObjectId(offer.recruiter_id) });
             const performa = {
                 offer_id: "",
                 offer_name: "",
@@ -44,7 +43,7 @@ router.get('/:domainName', (req, res, next) => {
             performa.offer_name = offer.offer_name;
             performa.skills = offer.skills;
             performa.float_date = offer.float_date;
-            performa.collegeName = recruiterProfile.collegeName;
+            performa.collegeName = recruiter.collegeName;
             vals.push(performa);
         }
         console.log(vals);
@@ -100,18 +99,18 @@ router.get('/:offerID/candidate', (req, res, next) => {
         };
         //console.log(performa);
         if(result){
-            //Obtaining recruiter profile for Name, CollegeName, Course and Semester
-            const recruiterProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(result.recruiter_id) });
+            //Obtaining recruiter user document for Name, CollegeName, Course and Semester
+            const recruiter = await User.findOne({ _id: mongoose.Types.ObjectId(result.recruiter_id) });
 
             //Obtaining Recruiter User detail for Phone Number
-            const recruiterUser = await User.findOne({ _id: mongoose.Types.ObjectId(result.recruiter_id) });
+            //const recruiterUser = await User.findOne({ _id: mongoose.Types.ObjectId(result.recruiter_id) });
 
             //Setting Recruiter details
-            performa.recruiter_name = recruiterProfile.name;
-            performa.recruiter_collegeName = recruiterProfile.collegeName;
-            performa.recruiter_course = recruiterProfile.course;
-            performa.recruiter_semester = recruiterProfile.semester;
-            performa.recruiter_phone = recruiterUser.phone;
+            performa.recruiter_name = recruiter.name;
+            performa.recruiter_collegeName = recruiter.collegeName;
+            performa.recruiter_course = recruiter.course;
+            performa.recruiter_semester = recruiter.semester;
+            performa.recruiter_phone = recruiter.phone;
 
             //console.log(performa);
             //Sending full detailed response
@@ -310,10 +309,10 @@ router.get('/:offerID/applicants', checkAuth, (req, res, next) => {
                     date:"",
                     applicant_id:""
                 };
-                //Obtaining applicant profile  for CollegeName
-                const applicantProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(result[i].applicant_id) });
+                //Obtaining applicant user document  for CollegeName
+                const applicant = await User.findOne({ _id: mongoose.Types.ObjectId(result[i].applicant_id) });
                 performa.application_id = result[i]._id;
-                performa.collegeName = applicantProfile.collegeName;
+                performa.collegeName = applicant.collegeName;
                 performa.is_Seen = result[i].is_Seen;
                 performa.is_Selected = result[i].is_Selected;
                 performa.date=result[i].apply_date;
@@ -356,13 +355,10 @@ router.get('/:offerID/applicants', checkAuth, (req, res, next) => {
 router.patch('/:offerID', checkAuth, (req, res, next) => {
     const off_id = req.params.offerID;
     Offer
-    .updateOne({_id : mongoose.Types.ObjectId(off_id)},
-    {
-        offer_name:req.body.offer_name,
-        requirements: req.body.requirements,
-        skills: req.body.skills,
-        expectation: req.body.expectation
-    })
+    .updateOne(
+        {_id : mongoose.Types.ObjectId(off_id)},
+        req.body
+    )
     .then(result => {
         res.status(200).json({
             code: 200,
@@ -459,7 +455,7 @@ router.get('/', checkAuth, (req, res, next) => {
         var vals = Array();
         for(i=0; i<result.length; i++){
             const offer = result[i];
-            const recruiterProfile = await Profile.findOne({ _id: mongoose.Types.ObjectId(offer.recruiter_id) });
+            const recruiter = await User.findOne({ _id: mongoose.Types.ObjectId(offer.recruiter_id) });
             const performa = {
                 offer_id: "",
                 offer_name: "",
@@ -471,7 +467,7 @@ router.get('/', checkAuth, (req, res, next) => {
             performa.offer_name = offer.offer_name;
             performa.skills = offer.skills;
             performa.float_date = offer.float_date;
-            performa.collegeName = recruiterProfile.collegeName;
+            performa.collegeName = recruiter.collegeName;
             vals.push(performa);
         }
         console.log(vals);

@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
-const Profile = require('../models/profile');
+//const Profile = require('../models/profile');
 const checkAuth = require('../middleware/check-auth');
 
 /*
@@ -30,7 +30,9 @@ router.post('/signup', (req, res, next) =>{
                         _id: mongoose.Types.ObjectId(),
                         email: req.body.email,
                         phone: req.body.phone,
-                        password: hash
+                        password: hash,
+                        name:req.body.name,
+                        profileCompleted: false
                     });
                     user
                         .save()
@@ -83,32 +85,29 @@ router.post('/signup', (req, res, next) =>{
                 message: "User Already Registered"
             });
         }
-            else if(user.length==0)
-            {
-                User
-                .find({phone:phoneC})
-                .exec()
-                .then(user2 => {
-                    if(user2.length >= 1){
-                        return res.status(300).json({
-                            code:300,
-                            message: "User Already Registered"
-                        });
-                    }
-                    else
-                       return res.status(200).json({
-                           code:200,
-                           message:"Credentials are Ok"
-                       }) 
-
+        else if(user.length==0)
+        {
+            User
+            .find({phone:phoneC})
+            .exec()
+            .then(user2 => {
+                if(user2.length >= 1){
+                    return res.status(300).json({
+                        code:300,
+                        message: "User Already Registered"
+                    });
+                }
+                else
+                    return res.status(200).json({
+                        code:200,
+                        message:"Credentials are Ok"
+                    }) 
                 })
-                        .catch(err => {
-                            console.log(err);
-                            return res.status(500).json(err);
-                        });
-        }
-
-         
+            .catch(err => {
+                console.log(err);
+                return res.status(500).json(err);
+            });
+        }         
     })
     .catch(err => {
         console.log(err);
@@ -128,7 +127,7 @@ router.post('/login', (req, res, next) => {
         if(user.length < 1){
             return res.status(200).json({
                 code:404,
-                message : "Authorisation failed"
+                message : "Authorization failed"
             });
         }
 
@@ -149,10 +148,10 @@ router.post('/login', (req, res, next) => {
                     expiresIn : "1h"
                 });
                 console.log(user[0]._id);
-                const profile = await Profile.findOne({_id: user[0]._id});
-                var profileCompl = (profile!=null);
-                console.log(profileCompl);
-                if(profileCompl){
+                //const profile = await Profile.findOne({_id: user[0]._id});
+                //var profileCompl = (profile!=null);
+                //console.log(profileCompl);
+                /*if(profileCompl){
                     return res.status(200).json({
                         code:200,
                         message : "Login successful",
@@ -173,6 +172,21 @@ router.post('/login', (req, res, next) => {
                         profile: null
                     });
                 }
+                return res.status(200).json({
+                    code:200,
+                    message : "Login successful",
+                    userID : user[0]._id,
+                    token : tok,
+                    userName: user[0].name,
+                    profileCompleted : user[0].profileCompleted,
+                    profile : profile
+                });*/
+                return res.status(200).json({
+                    code:200,
+                    message : "Login successful",
+                    token: tok,
+                    ...user[0]._doc
+                });
             }
             else{
                 return res.status(200).json({
@@ -192,6 +206,122 @@ router.post('/login', (req, res, next) => {
     });
 });
 
+/*
+    createProfile
+*/
+/*router.post('/', checkAuth, (req, res, next) => {
+    const date = new Date();
+    const user =  new User({
+        _id: mongoose.Types.ObjectId(req.body.userID) ,
+        name: req.body.name,
+        date: date,
+        collegeName: req.body.collegeName,
+        course: req.body.course,
+        semester: req.body.semester,
+        languages: req.body.languages,
+        interest1: req.body.interest1,
+        interest2: req.body.interest2,
+        interest3: req.body.interest3,
+        hobbies: req.body.hobbies,
+        description: req.body.description,
+       
+    });
+    console.log(User);
+    user
+    .save()
+    .then(result => {
+        res.status(200).json({
+            code: 200,
+            message: "Profile Created Succesfully",
+            user_id : result._id
+        });
+    })
+    .catch(err => {
+        console.log(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
+        });
+    });
+});*/
+
+/*
+    updateProfile
+*/
+router.patch('/:userId', checkAuth, (req, res, next) => {
+    const userId = req.params.userId;
+
+    User.updateOne(
+        {_id : mongoose.Types.ObjectId(userId)},
+        {$set : 
+            {
+                name: req.body.name,
+                date: req.body.date, 
+                collegeName: req.body.collegeName,
+                course: req.body.course,
+                semester: req.body.semester,
+                languages: req.body.languages,
+                interest1: req.body.interest1,
+                interest2: req.body.interest2,
+                interest3: req.body.interest3,
+                hobbies: req.body.hobbies,
+                description: req.body.description,
+                profileCompleted:true
+            }
+        }
+    )
+    .exec()
+    .then(result => {
+        res.status(200).json({
+            code: 200,
+            message: "User profile updated successfully." 
+        });
+    })
+    .catch(err => {
+        console.log(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
+        });
+    });
+});
+
+
+
+/*
+    getUserById
+*/
+router.get('/:userId', (req, res, next) => {
+    const userId = req.params.userId;
+
+    User.findOne({_id : mongoose.Types.ObjectId(userId)})
+    .exec()
+    .then(result => {
+        if(result){
+            res.status(200).json({
+                code: 200,
+                message: "Profile fetched successfully.",
+                ...result._doc
+            });
+        }
+        else{
+            res.status(404).json({
+                code: 404,
+                message: "Not found!"
+            });
+        }
+    })
+    .catch(err => {
+        console.log(err);
+        return res.status(500).json({
+            code: 500,
+            message: "Some error occured.",
+            error: err
+        });
+    });
+});
 
 
 
