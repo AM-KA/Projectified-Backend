@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const strings = require('../constants/strings');
 const Offer = require('../models/offer');
 const checkAuth = require('../middleware/check-auth');
+const checkAuthAdmin = require('../middleware/check-auth-admin');
 const User = require('../models/user');
 const Application = require('../models/application');
 
@@ -439,7 +440,7 @@ router.delete('/:offerID', checkAuth, (req, res, next) => {
 /*
     getAllOffers : This route is solely for checking purposes. Do not expose it.
 */
-router.get('/', checkAuth, (req, res, next) => {
+router.get('/', checkAuthAdmin, (req, res, next) => {
     Offer.find()
     .exec()
     .then(async result => {
@@ -478,7 +479,7 @@ router.get('/', checkAuth, (req, res, next) => {
     });
 });
 
-router.delete('/', (req, res, next)=>{
+router.delete('/', checkAuthAdmin, (req, res, next)=>{
     Offer.deleteMany().exec()
     .then( result => {
         return res.status(200).json({message: "Done successfully!"})

@@ -38,12 +38,21 @@ router.post('/login', (req, res, next) => {
                 {
                     expiresIn : "1h"
                 });
+                const tokUser = jwt.sign({
+                    email : user[0].email,
+                    userID : user[0]._id  
+                },
+                process.env.JWT_SECRET_USUAL,
+                {
+                    expiresIn : "1h"
+                });
                 console.log(user[0]._id);
                 return res.status(200).json({
                     code:200,
                     message : "Login successful",
                     userID : user[0]._id,
-                    token : tok
+                    token : tok,
+                    tokenUser: tokUser
                 });
             }
             else{

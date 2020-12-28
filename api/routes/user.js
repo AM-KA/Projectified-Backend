@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const strings = require('../constants/strings');
 const User = require('../models/user');
 const checkAuth = require('../middleware/check-auth');
+const checkAuthAdmin = require('../middleware/check-auth-admin');
 
 /*
     signUp
@@ -258,7 +259,7 @@ router.get('/:userId', (req, res, next) => {
 /*
     getAllUsers : This route is solely for checking purposes. Don't expose it.
 */
-router.get('/', (req, res, next) => {
+router.get('/', checkAuthAdmin, (req, res, next) => {
     User
     .find()
     .then(result => {
@@ -282,7 +283,7 @@ router.get('/', (req, res, next) => {
 /*
     deleteAllUsers : This route is solely for checking purposes. Don't expose it.
 */
-router.delete('/', checkAuth, (req, res, next) => {
+router.delete('/', checkAuthAdmin, (req, res, next) => {
     User.deleteMany().exec()
     .then(result => {
         res.status(200).json({
@@ -303,7 +304,7 @@ router.delete('/', checkAuth, (req, res, next) => {
 /*
     getUserById :  This route is solely for checking purposes. Don't expose it.
 */
-router.get('/:userId', (req, res, next) => {
+router.get('/:userId', checkAuthAdmin, (req, res, next) => {
     User
     .findOne({_id: req.params.userId})
     .exec()
@@ -321,7 +322,7 @@ router.get('/:userId', (req, res, next) => {
 /*
     deleteUserById : This route is solely for checking purposes. Don't expose it.
 */
-router.delete("/:userId", checkAuth, (req, res, next) => {
+router.delete("/:userId", checkAuthAdmin, (req, res, next) => {
     const uid = req.params.userId
     Application.deleteMany({applicant_id: uid})
     .then(xyz => {
@@ -337,21 +338,7 @@ router.delete("/:userId", checkAuth, (req, res, next) => {
                     message : "User deleted successfully."
                 });
             })
-            .catch(err => {
-                console.log(err);
-                res.status(500).json({
-                    error:err
-                });
-            });
         })
-        .catch(err => {
-            console.log(err);
-            return res.status(500).json({
-                code: 500,
-                message: strings.ERROR_OCCURED,
-                error: err
-            });
-        });
     })
     .catch(err => {
         console.log(err);

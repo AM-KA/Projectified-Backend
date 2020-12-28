@@ -6,7 +6,8 @@ const jwt = require('jsonwebtoken');
 const Application = require('../models/application');
 const checkAuth = require('../middleware/check-auth');
 const User = require('../models/user');
-const Offer = require('../models/offer')
+const Offer = require('../models/offer');
+const checkAuthAdmin = require('../middleware/check-auth-admin');
 
 
 //CANDIDATE OPTIONS 
@@ -365,7 +366,7 @@ router.patch('/:applicationID/selected', checkAuth, (req, res, next) => {
 /*
     getAllApplications
 */
-router.get('/', (req, res, next) => {
+router.get('/', checkAuthAdmin, (req, res, next) => {
     
     Application.find()
     .exec()
