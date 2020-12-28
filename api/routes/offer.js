@@ -2,12 +2,11 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-
+const strings = require('../constants/strings');
 const Offer = require('../models/offer');
 const checkAuth = require('../middleware/check-auth');
 const User = require('../models/user');
 const Application = require('../models/application');
-const { resource } = require('../../app');
 
 //  CANDIDATE OPTIONS
 
@@ -57,7 +56,7 @@ router.get('/:domainName', (req, res, next) => {
         console.log(err);
         return res.status(500).json({
             code: 500,
-            message: "Some error occured.",
+            message: strings.ERROR_OCCURED,
             error: err
         });
     });
@@ -116,7 +115,7 @@ router.get('/:offerID/candidate', (req, res, next) => {
             //Sending full detailed response
             const obj = {
                 code: 200,
-                message : "Offer detail fetched successfully.",
+                message : "Offer details were fetched successfully.",
                 offer : performa
             };
             console.log(obj);
@@ -125,7 +124,7 @@ router.get('/:offerID/candidate', (req, res, next) => {
         else{
             res.status(404).json({
                 code: 404,
-                message : "Not found."
+                message : strings.NOT_FOUND
             });
         }
     })
@@ -133,7 +132,7 @@ router.get('/:offerID/candidate', (req, res, next) => {
         console.log(err);
         return res.status(500).json({
             code: 500,
-            message: "Some error occured.",
+            message: strings.ERROR_OCCURED,
             error: err
         });
     });
@@ -171,7 +170,7 @@ router.post('/', checkAuth, (req, res, next) => {
     .then(result => {
         res.status(200).json({
             code: 200,
-            message: "Offer added successfully",
+            message: "New offer was added successfully.",
             job_id : offer._id
         });
     })
@@ -179,7 +178,7 @@ router.post('/', checkAuth, (req, res, next) => {
         console.log(err);
         return res.status(500).json({
             code: 500,
-            message: "Some error occured.",
+            message: strings.ERROR_OCCURED,
             error: err
         });
     });
@@ -218,7 +217,7 @@ router.get('/recruiter/:recruiterID', checkAuth, (req, res, next) => {
         }
         res.status(200).json({
             code: 200,
-            message: "Offers fetched successfully.",
+            message: "Offers were fetched successfully.",
             offers : vals
         });
     })
@@ -226,7 +225,7 @@ router.get('/recruiter/:recruiterID', checkAuth, (req, res, next) => {
         console.log(err);
         return res.status(500).json({
             code: 500,
-            message: "Some error occured.",
+            message: strings.ERROR_OCCURED,
             error: err
         });
     });
@@ -265,7 +264,7 @@ router.get('/:offerID/recruiter', checkAuth, (req, res, next) => {
             performa.is_visible = result.is_visible;
         res.status(200).json({
             code: 200,
-            message: "Offer fetched successfully.",
+            message: "Offer was fetched successfully.",
             offer : performa
         });
     })
@@ -273,7 +272,7 @@ router.get('/:offerID/recruiter', checkAuth, (req, res, next) => {
         console.log(err);
         return res.status(500).json({
             code: 500,
-            message: "Some error occured.",
+            message: strings.ERROR_OCCURED,
             error: err
         });
     });
@@ -322,14 +321,14 @@ router.get('/:offerID/applicants', checkAuth, (req, res, next) => {
             }
             res.status(200).json({
                 code: 200,
-                message : "Applications detail fetched successfully.",
+                message : "Details of the application were fetched successfully.",
                 applicants : vals
             });
         }
         else{
             res.status(404).json({
                 code: 404,
-                message : "Not found."
+                message : strings.NOT_FOUND
             });
         }
     })
@@ -337,7 +336,7 @@ router.get('/:offerID/applicants', checkAuth, (req, res, next) => {
         console.log(err);
         return res.status(500).json({
             code: 500,
-            message: "Some error occured.",
+            message: strings.ERROR_OCCURED,
             error: err
         });
     });
@@ -362,14 +361,14 @@ router.patch('/:offerID', checkAuth, (req, res, next) => {
     .then(result => {
         res.status(200).json({
             code: 200,
-            message : "Offer details updated successfully."
+            message : "Offer details were updated successfully."
         })
     })
     .catch(err => {
         console.log(err);
         return res.status(500).json({
             code: 500,
-            message: "Some error occured.",
+            message: strings.ERROR_OCCURED,
             error: err
         });
     });
@@ -391,14 +390,14 @@ router.post('/:offerID/toggle', checkAuth, (req, res, next) => {
     .then(result =>{
         res.status(200).json({
             code: 200,
-            message: "Offer visibility changed successfully."
+            message: "Offer visibility was changed successfully."
         });
     })
     .catch(err => {
         console.log(err);
         return res.status(500).json({
             code: 500,
-            message: "Some error occured.",
+            message: strings.ERROR_OCCURED,
             error: err
         });
     });
@@ -419,23 +418,15 @@ router.delete('/:offerID', checkAuth, (req, res, next) => {
         .then(result =>{
             res.status(200).json({
                 code: 200,
-                message : "Offer deleted successfully."
+                message : "The offer was deleted successfully."
             });
         })
-        .catch(err => {
-            console.log(err);
-            return res.status(500).json({
-                code: 500,
-                message: "Some error occured.",
-                error: err
-            });
-        });
     })
     .catch(err => {
         console.log(err);
         return res.status(500).json({
             code: 500,
-            message: "Some error occured.",
+            message: strings.ERROR_OCCURED,
             error: err
         });
     });
@@ -473,7 +464,7 @@ router.get('/', checkAuth, (req, res, next) => {
         console.log(vals);
         res.status(200).json({
             code: 200,
-            message : "Offers fetched successfully.",
+            message : "Offers were fetched successfully.",
             offers: vals
         });
     })
@@ -481,7 +472,7 @@ router.get('/', checkAuth, (req, res, next) => {
         console.log(err);
         return res.status(500).json({
             code: 500,
-            message: "Some error occured.",
+            message: strings.ERROR_OCCURED,
             error: err
         });
     });

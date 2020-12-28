@@ -3,9 +3,9 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
+const strings = require('../constants/strings');
 const Admin = require('../models/admin');
-const checkAuth = require('../middleware/check-auth');
+const checkAuthAdmin = require('../middleware/check-auth-admin');
 
 /*
     logIn
@@ -18,7 +18,7 @@ router.post('/login', (req, res, next) => {
         if(user.length < 1){
             return res.status(200).json({
                 code:404,
-                message : "Authorisation failed"
+                message : strings.AUTH_FAILED
             });
         }
 
@@ -26,7 +26,7 @@ router.post('/login', (req, res, next) => {
             if(err){
                 return res.status(200).json({
                     code:401,
-                    message : "Authorization failed"
+                    message : strings.AUTH_FAILED
                 });
             }
             if(result){
@@ -34,7 +34,7 @@ router.post('/login', (req, res, next) => {
                     email : user[0].email,
                     userID : user[0]._id  
                 },
-                "secret",
+                process.env.JWT_SECRET_ADMIN,
                 {
                     expiresIn : "1h"
                 });
@@ -49,7 +49,7 @@ router.post('/login', (req, res, next) => {
             else{
                 return res.status(200).json({
                     code:401,
-                    message : "Authorization failed"
+                    message : strings.AUTH_FAILED
                 });
             }
         });
@@ -58,7 +58,7 @@ router.post('/login', (req, res, next) => {
         console.log(err);
         return res.status(500).json({
             code: 500,
-            message: "Some error occured.",
+            message: strings.ERROR_OCCURED,
             error: err
         });
     });

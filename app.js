@@ -7,13 +7,11 @@ const mongoose = require('mongoose');
 const userRoutes = require('./api/routes/user');
 const adminRoutes = require('./api/routes/admin');
 const offerRoutes = require('./api/routes/offer');
-const userProfileRoutes=require('./api/routes/profile');
 const applicationRoutes=require('./api/routes/application')
 const faqRoutes = require('./api/routes/faq');
-const ratingRoutes = require('./api/routes/ratings');
 
 mongoose.connect(
-    'mongodb+srv://dbUser:abcd1234@projectified.kcttx.mongodb.net/<dbname>?retryWrites=true&w=majority',
+    'mongodb+srv://dbUser:'+process.env.MONGO_ATLAS_PW+'@projectified.kcttx.mongodb.net/<dbname>?retryWrites=true&w=majority',
     {
         useNewUrlParser:true,
         useUnifiedTopology:true
@@ -44,12 +42,10 @@ app.use((req, res, next)=>{
 });
 
 app.use('/application', applicationRoutes);
-app.use('/profile', userProfileRoutes)
 app.use('/user', userRoutes);
 app.use('/admin', adminRoutes);
 app.use ('/offer', offerRoutes);
 app.use('/faq', faqRoutes);
-app.use('/rating', ratingRoutes);
 
 app.use((req, res, next)=> {
     const error = new Error("Not found");

@@ -3,7 +3,7 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
+const strings = require('../constants/strings');
 const FAQ = require('../models/faq');
 
 /*
@@ -15,7 +15,7 @@ router.get('/', (request, response, next) => {
     .then(result => {
         response.status(200).json({
             code: 200,
-            message: "FAQ Items fetched successfully.",
+            message: "FAQ items were fetched successfully.",
             faqList: result
         });
     })
@@ -23,7 +23,7 @@ router.get('/', (request, response, next) => {
         console.log(err);
         return res.status(500).json({
             code: 500,
-            message: "Some error occured.",
+            message: strings.ERROR_OCCURED,
             error: err
         });
     });
@@ -44,14 +44,14 @@ router.post('/', (request, response, next) => {
     .then(result => {
         response.status(200).json({
             code: 200,
-            message: "Item added successfully."
+            message: "Your question was posted successfully. It will be answered soon."
         });
     })
     .catch(err => {
         console.log(err);
         return res.status(500).json({
             code: 500,
-            message: "Some error occured.",
+            message: strings.ERROR_OCCURED,
             error: err
         });
     });
@@ -85,7 +85,7 @@ router.patch('/:faqID', (request, response, next) => {
             console.log(err);
             return res.status(500).json({
                 code: 500,
-                message: "Some error occured.",
+                message: strings.ERROR_OCCURED,
                 error: err
             });
         });
@@ -110,7 +110,7 @@ router.delete('/:faqID', (request, response, next) => {
             console.log(err);
             return res.status(500).json({
                 code: 500,
-                message: "Some error occured.",
+                message: strings.ERROR_OCCURED,
                 error: err
             });
         });
@@ -128,7 +128,7 @@ router.get('/all', (request, response, next) => {
         console.log(err);
         return res.status(500).json({
             code: 500,
-            message: "Some error occured.",
+            message: strings.ERROR_OCCURED,
             error: err
         });
     });
@@ -143,7 +143,7 @@ router.get('/unanswered', (request, response, next) => {
     .then(result => {
         response.status(200).json({
             code: 200,
-            message: "FAQ Items fetched successfully.",
+            message: "FAQ items were fetched successfully.",
             faqList: result
         });
     })
@@ -151,7 +151,7 @@ router.get('/unanswered', (request, response, next) => {
         console.log(err);
         return res.status(500).json({
             code: 500,
-            message: "Some error occured.",
+            message: strings.ERROR_OCCURED,
             error: err
         });
     });

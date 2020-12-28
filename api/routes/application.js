@@ -198,7 +198,7 @@ router.get('/:applicationID', (req, res, next) => {
         }
         else{
             res.status(404).json({
-                code:200,
+                code:404,
                 message : "The requested data was not found."
             });
         }
@@ -257,7 +257,7 @@ router.get('/:applicationID/recruiter', (req, res, next) => {
         }
         else{
             res.status(404).json({
-                code:200,
+                code:404,
                 message : "The requested data was not found."
             });
         }

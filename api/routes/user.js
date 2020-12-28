@@ -3,9 +3,8 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
+const strings = require('../constants/strings');
 const User = require('../models/user');
-//const Profile = require('../models/profile');
 const checkAuth = require('../middleware/check-auth');
 
 /*
@@ -19,7 +18,7 @@ router.post('/signup', (req, res, next) =>{
         if(user.length >= 1)
             return res.status(200).json({
                 code:422,
-                message: "Mail exists!"
+                message: strings.MAIL_EXISTS
             });
         else{
             bcrypt.hash(req.body.password, 10, (err, hash) => {
@@ -40,14 +39,14 @@ router.post('/signup', (req, res, next) =>{
                             console.log(result);
                             res.status(200).json({
                                 code:200,
-                                message: 'User created'
+                                message: 'New user was created successfully'
                             });
                         })
                         .catch(err => {
                             console.log(err);
                             return res.status(500).json({
                                 code: 500,
-                                message: "Some error occured.",
+                                message: strings.ERROR_OCCURED,
                                 error: err
                             });         
                         });
@@ -59,7 +58,7 @@ router.post('/signup', (req, res, next) =>{
         console.log(err);
         return res.status(500).json({
             code: 500,
-            message: "Some error occured.",
+            message: strings.ERROR_OCCURED,
             error: err
         });
     });
@@ -82,7 +81,7 @@ router.post('/signup', (req, res, next) =>{
         if(user.length >= 1){
             return res.status(300).json({
                 code:300,
-                message: "User Already Registered"
+                message: strings.MAIL_EXISTS
             });
         }
         else if(user.length==0)
@@ -94,13 +93,13 @@ router.post('/signup', (req, res, next) =>{
                 if(user2.length >= 1){
                     return res.status(300).json({
                         code:300,
-                        message: "User Already Registered"
+                        message: strings.PHONE_EXISTS
                     });
                 }
                 else
                     return res.status(200).json({
                         code:200,
-                        message:"Credentials are Ok"
+                        message: strings.CREDENTIALS_OK
                     }) 
                 })
             .catch(err => {
@@ -127,7 +126,7 @@ router.post('/login', (req, res, next) => {
         if(user.length < 1){
             return res.status(200).json({
                 code:404,
-                message : "Authorization failed"
+                message : strings.AUTH_FAILED
             });
         }
 
@@ -135,7 +134,7 @@ router.post('/login', (req, res, next) => {
             if(err){
                 return res.status(200).json({
                     code:401,
-                    message : "Authorization failed"
+                    message : strings.AUTH_FAILED
                 });
             }
             if(result){
@@ -143,44 +142,11 @@ router.post('/login', (req, res, next) => {
                     email : user[0].email,
                     userID : user[0]._id  
                 },
-                "secret",
+                process.env.JWT_SECRET_USUAL,
                 {
                     expiresIn : "1h"
                 });
                 console.log(user[0]._id);
-                //const profile = await Profile.findOne({_id: user[0]._id});
-                //var profileCompl = (profile!=null);
-                //console.log(profileCompl);
-                /*if(profileCompl){
-                    return res.status(200).json({
-                        code:200,
-                        message : "Login successful",
-                        userID : user[0]._id,
-                        token : tok,
-                        userName: profile.name,
-                        profileCompleted : true,
-                        profile : profile
-                    });
-                }else{
-                    return res.status(200).json({
-                        code:200,
-                        message : "Login successful",
-                        userID : user[0]._id,
-                        token : tok,
-                        userName: null,
-                        profileCompleted : false,
-                        profile: null
-                    });
-                }
-                return res.status(200).json({
-                    code:200,
-                    message : "Login successful",
-                    userID : user[0]._id,
-                    token : tok,
-                    userName: user[0].name,
-                    profileCompleted : user[0].profileCompleted,
-                    profile : profile
-                });*/
                 return res.status(200).json({
                     code:200,
                     message : "Login successful",
@@ -191,7 +157,7 @@ router.post('/login', (req, res, next) => {
             else{
                 return res.status(200).json({
                     code:401,
-                    message : "Authorization failed"
+                    message : strings.AUTH_FAILED
                 });
             }
         });
@@ -200,51 +166,12 @@ router.post('/login', (req, res, next) => {
         console.log(err);
         return res.status(500).json({
             code: 500,
-            message: "Some error occured.",
+            message: strings.ERROR_OCCURED,
             error: err
         });
     });
 });
 
-/*
-    createProfile
-*/
-/*router.post('/', checkAuth, (req, res, next) => {
-    const date = new Date();
-    const user =  new User({
-        _id: mongoose.Types.ObjectId(req.body.userID) ,
-        name: req.body.name,
-        date: date,
-        collegeName: req.body.collegeName,
-        course: req.body.course,
-        semester: req.body.semester,
-        languages: req.body.languages,
-        interest1: req.body.interest1,
-        interest2: req.body.interest2,
-        interest3: req.body.interest3,
-        hobbies: req.body.hobbies,
-        description: req.body.description,
-       
-    });
-    console.log(User);
-    user
-    .save()
-    .then(result => {
-        res.status(200).json({
-            code: 200,
-            message: "Profile Created Succesfully",
-            user_id : result._id
-        });
-    })
-    .catch(err => {
-        console.log(err);
-        return res.status(500).json({
-            code: 500,
-            message: "Some error occured.",
-            error: err
-        });
-    });
-});*/
 
 /*
     updateProfile
@@ -282,7 +209,7 @@ router.patch('/:userId', checkAuth, (req, res, next) => {
         console.log(err);
         return res.status(500).json({
             code: 500,
-            message: "Some error occured.",
+            message: strings.ERROR_OCCURED,
             error: err
         });
     });
@@ -309,7 +236,7 @@ router.get('/:userId', (req, res, next) => {
         else{
             res.status(404).json({
                 code: 404,
-                message: "Not found!"
+                message: strings.NOT_FOUND
             });
         }
     })
@@ -317,7 +244,7 @@ router.get('/:userId', (req, res, next) => {
         console.log(err);
         return res.status(500).json({
             code: 500,
-            message: "Some error occured.",
+            message: strings.ERROR_OCCURED,
             error: err
         });
     });
@@ -338,14 +265,14 @@ router.get('/', (req, res, next) => {
         res.status(200).json({
             ...result,
             code: 200,
-            message: "Fetch success."
+            message: "Users were fetched successfully."
         });
     })
     .catch(err => {
         console.log(err);
         return res.status(500).json({
             code: 500,
-            message: "Some error occured.",
+            message: strings.ERROR_OCCURED,
             error: err
         });
     });
@@ -360,7 +287,7 @@ router.delete('/', checkAuth, (req, res, next) => {
     .then(result => {
         res.status(200).json({
             code:200,
-            message : "Delete success"
+            message : "All users deleted successfully."
         });
     })
     .catch(err => {
@@ -390,6 +317,7 @@ router.get('/:userId', (req, res, next) => {
         });
     });
 });
+           
 /*
     deleteUserById : This route is solely for checking purposes. Don't expose it.
 */
@@ -406,7 +334,7 @@ router.delete("/:userId", checkAuth, (req, res, next) => {
             .then(result => {
                 res.status(200).json({
                     code:200,
-                    message : "Delete success!"
+                    message : "User deleted successfully."
                 });
             })
             .catch(err => {
@@ -420,7 +348,7 @@ router.delete("/:userId", checkAuth, (req, res, next) => {
             console.log(err);
             return res.status(500).json({
                 code: 500,
-                message: "Some error occured.",
+                message: strings.ERROR_OCCURED,
                 error: err
             });
         });
@@ -429,7 +357,7 @@ router.delete("/:userId", checkAuth, (req, res, next) => {
         console.log(err);
         return res.status(500).json({
             code: 500,
-            message: "Some error occured.",
+            message: strings.ERROR_OCCURED,
             error: err
         });
     });
