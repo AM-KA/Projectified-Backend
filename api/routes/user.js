@@ -5,8 +5,11 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const strings = require('../constants/strings');
 const User = require('../models/user');
+const Application = require('../models/application');
+const Offer = require('../models/offer');
 const checkAuth = require('../middleware/check-auth');
 const checkAuthAdmin = require('../middleware/check-auth-admin');
+const nodemailer = require('nodemailer');
 
 /*
     signUp
@@ -32,7 +35,8 @@ router.post('/signup', (req, res, next) =>{
                         phone: req.body.phone,
                         password: hash,
                         name:req.body.name,
-                        profileCompleted: false
+                        profileCompleted: false,
+                        date: Date.now()
                     });
                     user
                         .save()
@@ -173,7 +177,130 @@ router.post('/login', (req, res, next) => {
     });
 });
 
+router.post('/reset/generateOtp', (req, res, next)=>{
+    const emailId = req.body.email;
+    User.find({email:emailId})
+    .exec()
+    .then(async user => {
+        if(user.length < 1){
+            return res.status(200).json({
+                code:400,
+                message:strings.AUTH_FAILED
+            });
+        }
+        const otpTime = user[0].resetRequestTimestamp;
+        const timeDifference = ((new Date()).getTime() - otpTime.getTime())/(1000*60);
+        if(timeDifference<5){
+            return res.status(200).json({
+                code:400,
+                message:strings.TOO_SOON
+            })   
+        }
+        var digits = '0123456789'; 
+        let OTP = ''; 
+        for (let i = 0; i < 6; i++ ) { 
+            OTP += digits[Math.floor(Math.random() * 10)]; 
+        }
+        let transporter = nodemailer.createTransport({
+            service:'gmail',
+            auth:{
+                user:'am.ka.apps@gmail.com',
+                pass:process.env.MAIL_PW
+            }
+        })
+        var message = {
+            from:'am.ka.apps@gmail.com',
+            to:emailId,
+            subject:"Projectified: OTP for Password Reset",
+            text:"OTP for your Password Reset Request is "+OTP+".",
+            html:"<p>OTP for your Password Reset Request is "+OTP+".</p>"
+        }
+        let update = await User.updateOne({_id:user[0]._id}, {$set:{resetRequestTimestamp:Date.now(), resetOtp:OTP}});
+        let info = await transporter.sendMail(message)
+        return res.status(200).json({
+            code:200,
+            message:strings.OTP_SENT
+        });
+    })
+    .catch(err => {
+        console.log(err);
+        return res.status(500).json({
+            code: 500,
+            message: strings.ERROR_OCCURED,
+            error: err
+        });
+    });
+});
 
+router.post('/reset/verifyOtp', (req, res, next)=>{
+    const body = req.body;
+    User.find(body)
+    .exec()
+    .then(user=>{
+        if(user.length==0){
+            return res.status(200).json({
+                code:400,
+                message:strings.AUTH_FAILED
+            });
+        }
+        User.updateOne(body, {resetOtp:"000000", resetRequestAccepted:true})
+        .then(result=>{
+            return res.status(200).json({
+                code:200,
+                message:strings.OTP_SUCCESS
+            });
+        })
+    })
+    .catch(err => {
+        console.log(err);
+        return res.status(500).json({
+            code: 500,
+            message: strings.ERROR_OCCURED,
+            error: err
+        });
+    });
+});
+
+router.post('/reset/updatePassword',(req, res, next)=>{
+    User
+    .find({email: req.body.email, resetRequestAccepted:true})
+    .exec()
+    .then(user => {
+        if(user.length < 1)
+            return res.status(200).json({
+                code:400,
+                message: strings.BAD_REQUEST
+            });
+        else{
+            bcrypt.hash(req.body.password, 10, (err, hash) => {
+                if(err){
+                    return res.status(500).json({error:err});
+                }
+                User
+                .updateOne(
+                    {email:req.body.email},
+                    {password:hash, resetRequestAccepted:false}
+                )
+                .then(result => {
+                    console.log(result);
+                    res.status(200).json({
+                        code:200,
+                        message: 'Password was updated successfully.'
+                    });
+                })
+                
+            });
+        }
+    })
+    .catch(err => {
+        console.log(err);
+        return res.status(500).json({
+            code: 500,
+            message: strings.ERROR_OCCURED,
+            error: err
+        });
+    });
+});
 /*
     updateProfile
 */
@@ -221,7 +348,7 @@ router.patch('/:userId', checkAuth, (req, res, next) => {
 /*
     getUserById
 */
-router.get('/:userId', (req, res, next) => {
+router.get('/:userId', checkAuthAdmin, (req, res, next) => {
     const userId = req.params.userId;
 
     User.findOne({_id : mongoose.Types.ObjectId(userId)})
@@ -264,7 +391,7 @@ router.get('/', checkAuthAdmin, (req, res, next) => {
     .find()
     .then(result => {
         res.status(200).json({
-            ...result,
+            users:result,
             code: 200,
             message: "Users were fetched successfully."
         });
@@ -330,7 +457,7 @@ router.delete("/:userId", checkAuthAdmin, (req, res, next) => {
         .deleteMany({recruiter_id : uid})
         .exec()
         .then(result =>{
-            User.remove({_id: req.params.userId})
+            User.deleteOne({_id: uid})
             .exec()
             .then(result => {
                 res.status(200).json({

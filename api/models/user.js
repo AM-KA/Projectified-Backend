@@ -64,6 +64,17 @@ const userSchema = mongoose.Schema({
     profileCompleted:{
         type:Boolean,
         required: true
+    },
+    resetRequestTimestamp:{
+        type:Date,
+        default:Date.now()
+    },
+    resetRequestAccepted:{
+        type:Boolean,
+        default:false
+    },
+    resetOtp:{
+        type:String
     }
 });
 
