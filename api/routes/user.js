@@ -452,19 +452,21 @@ router.get('/:userId', checkAuthAdmin, (req, res, next) => {
 router.delete("/:userId", checkAuthAdmin, (req, res, next) => {
     const uid = req.params.userId
     Application.deleteMany({applicant_id: uid})
-    .then(xyz => {
-        Offer
-        .deleteMany({recruiter_id : uid})
+    .then(async xyz => {
+        const offers = await Offer.find({recruiter_id : uid})
+        var offerIdList = [];
+        for(i=0; i<offers.length; i++){
+            offerIdList.push(offers[i]._id)
+        }
+        const del = await Application.deleteMany({offer_id:{$in:offerIdList}})
+        const offDel = await Offer.deleteMany({recruiter_id: uid})
+        User.deleteOne({_id: uid})
         .exec()
-        .then(result =>{
-            User.deleteOne({_id: uid})
-            .exec()
-            .then(result => {
-                res.status(200).json({
-                    code:200,
-                    message : "User deleted successfully."
-                });
-            })
+        .then(result => {
+            res.status(200).json({
+                code:200,
+                message : "User deleted successfully."
+            });
         })
     })
     .catch(err => {
