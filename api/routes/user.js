@@ -149,7 +149,7 @@ router.post('/login', (req, res, next) => {
                 },
                 process.env.JWT_SECRET_USUAL,
                 {
-                    expiresIn : "1h"
+                    expiresIn : "30d"
                 });
                 console.log(user[0]._id);
                 return res.status(200).json({

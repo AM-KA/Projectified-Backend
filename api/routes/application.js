@@ -32,25 +32,35 @@ router.post('/', checkAuth, (req, res, next) => {
 
     });
 
-   Application.find({offer_id :offer_idC , applicant_id:applicant_idC} )
-   .then(async result => {
-    if(result.length>0){
-        res.status(201).json({
-            message:"You have already applied for this opportunity. Check the status of your application in the 'My Applications' tab.",
-            code:201
-        })
-    }
-    else{
-    console.log(application);
-    application.save()
-    .then(result => {
-        res.status(200).json({
-            message: "You have applied successfully for this opportunity.",
-            code:200
-        });
+    Offer.find({_id: offer_idC, recruiter_id: applicant_idC})
+    .then(result=>{
+        if(result.length>0){
+            res.status(201).json({
+                message:"You cannot apply for an offer floated by yourself.",
+                code:201
+            });
+        }else{
+            Application.find({offer_id :offer_idC , applicant_id:applicant_idC} )
+            .then(async result => {
+                if(result.length>0){
+                    res.status(201).json({
+                        message:"You have already applied for this opportunity. Check the status of your application in the 'My Applications' tab.",
+                        code:201
+                    })
+                }
+                else{
+                    console.log(application);
+                    application.save()
+                    .then(result => {
+                        res.status(200).json({
+                            message: "You have applied successfully for this opportunity.",
+                            code:200
+                        });
+                    })
+                }
+            })
+        }
     })
-}
-   })
     .catch(err => {
         console.log(err);
         return res.status(500).json(err);
@@ -113,7 +123,7 @@ router.get('/byApplicant/:applicantID', checkAuth, (req, res, next) => {
     Application.find({applicant_id :  mongoose.Types.ObjectId(appt_id)})
     .then(async result  => {
         var vals = [];
-    
+        console.log(result)
         for(i=0; i<result.length; i++){
            //Obtaining offer Details for Offer Name and Offer date
             const offer =await Offer.findOne({ _id: mongoose.Types.ObjectId(result[i].offer_id) });
